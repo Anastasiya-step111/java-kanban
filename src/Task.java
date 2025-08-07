@@ -4,13 +4,16 @@ public class Task {
     private int id;
     private Status status;
 
-    public Task(String title, String description) {
+    private final TaskManager taskManager;
+
+    public Task(String title, String description, TaskManager taskManager) {
         this.title = title;
         this.description = description;
-        this.id = TaskManager.taskCount++;
+        this.taskManager = taskManager;
+        this.id = taskManager.addTaskAndGetId();
         this.status = Status.NEW;
     }
-    // Геттеры и сеттеры
+
     public String getTitle() {
         return title;
     }
@@ -29,6 +32,10 @@ public class Task {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Status getStatus() {

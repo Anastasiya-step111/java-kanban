@@ -2,12 +2,10 @@ import java.util.ArrayList;
 
 public class Epic extends Task {
     private ArrayList<Subtask> subtasks;
-    private int id;
 
-    public Epic(String title, String description) {
-        super(title, description);
+    public Epic(String title, String description, TaskManager taskManager) {
+        super(title, description, taskManager);
         this.subtasks = new ArrayList<>();
-        this.id = TaskManager.taskCount++;
     }
 
     // Методы для работы с подзадачами
