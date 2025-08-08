@@ -6,12 +6,12 @@ public class Task {
 
     private final TaskManager taskManager;
 
-    public Task(String title, String description, TaskManager taskManager) {
+    public Task(String title, String description, TaskManager taskManager, Status status) {
         this.title = title;
         this.description = description;
         this.taskManager = taskManager;
         this.id = taskManager.addTaskAndGetId();
-        this.status = Status.NEW;
+        this.status = status;
     }
 
     public String getTitle() {
@@ -46,3 +46,5 @@ public class Task {
         this.status = status;
     }
 }
+
+
