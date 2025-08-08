@@ -14,7 +14,6 @@ public class Epic extends Task {
 
     @Override
     public Status getStatus() {
-        // Проверяем статус эпика по статусам подзадач
         for (Subtask subtask : subtasks) {
             if (subtask.getStatus() != Status.DONE) {
                 return Status.IN_PROGRESS;
