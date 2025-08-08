@@ -10,7 +10,7 @@ public class Task {
         this.title = title;
         this.description = description;
         this.taskManager = taskManager;
-        this.id = taskManager.addTaskAndGetId();
+        this.id = taskManager.getCurrentTaskCount();
         this.status = status;
     }
 

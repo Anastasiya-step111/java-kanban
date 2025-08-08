@@ -14,11 +14,32 @@ public class Epic extends Task {
 
     @Override
     public Status getStatus() {
+        boolean allNew = true;
+        boolean hasInProgress = false;
+        boolean allDone = true;
+
         for (Subtask subtask : subtasks) {
-            if (subtask.getStatus() != Status.DONE) {
-                return Status.IN_PROGRESS;
+            Status subtaskStatus = subtask.getStatus();
+            if (subtaskStatus != Status.NEW) {
+                allNew = false;
+            }
+            if (subtaskStatus == Status.IN_PROGRESS) {
+                hasInProgress = true;
+            }
+            if (subtaskStatus == Status.DONE) {
+                allDone = false;
             }
         }
-        return Status.DONE;
+            if(hasInProgress) {
+                return Status.IN_PROGRESS;
+            }
+            if(allDone) {
+                return Status.DONE;
+            }
+            if (allNew) {
+                return Status.NEW;
+            }
+        return Status.NEW;
     }
+
 }
