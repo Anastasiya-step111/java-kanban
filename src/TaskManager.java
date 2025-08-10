@@ -60,10 +60,38 @@ public class TaskManager {
 
     public void updateEpic(Epic epic) {
         if (epics.containsKey(epic.getId())) {
-            Status status = epic.getStatus();
+            Status status = updateStatusEpic(epic);
             epic.setStatus(status);
             epics.put(epic.getId(), epic);
         }
+    }
+    private Status updateStatusEpic(Epic epic) {
+        boolean allNew = true;
+        boolean hasInProgress = false;
+        boolean allDone = true;
+        ArrayList<Subtask> subtasks = epic.getSubtasks();
+        for (Subtask subtask : subtasks) {
+            Status subtaskStatus = subtask.getStatus();
+            if (subtaskStatus != Status.NEW) {
+                allNew = false;
+            }
+            if (subtaskStatus == Status.IN_PROGRESS) {
+                hasInProgress = true;
+            }
+            if (subtaskStatus == Status.DONE) {
+                allDone = false;
+            }
+        }
+        if(hasInProgress) {
+            return Status.IN_PROGRESS;
+        }
+        if(allDone) {
+            return Status.DONE;
+        }
+        if (allNew) {
+            return Status.NEW;
+        }
+        return Status.NEW;
     }
 
     public void deleteEpic(int id) {
