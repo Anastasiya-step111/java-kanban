@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TaskManager {
-    private static int taskCount;
+    private static int taskCount = 1;
 
     private HashMap<Integer, Task> tasks = new HashMap<>();
     private HashMap<Integer, Epic> epics = new HashMap<>();
@@ -23,9 +23,7 @@ public class TaskManager {
     }
 
     public void createTask(Task task) {
-        if (task.getId() == 0) {
-            task.setId(taskCount++);
-        }
+        task.setId(taskCount++);
         tasks.put(task.getId(), task);
     }
 
@@ -52,9 +50,7 @@ public class TaskManager {
     }
 
     public void createEpic(Epic epic) {
-        if (epic.getId() == 0) {
-            epic.setId(taskCount++);
-        }
+        epic.setId(taskCount++);
         epics.put(epic.getId(), epic);
     }
 
@@ -128,20 +124,71 @@ public class TaskManager {
     }
 
     public void createSubtask(Subtask subtask) {
-        if (subtask.getId() == 0) {
-            subtask.setId(taskCount++);
-        }
+        subtask.setId(taskCount++);
         subtasks.put(subtask.getId(), subtask);
+        int epicId = subtask.getEpicId();
+        Epic epic = epics.get(epicId);
+        epic.addSubtask(subtask);
+        // Обновляем статус эпика
+        Status newStatus = updateStatusEpic(epic);
+        epic.setStatus(newStatus);
+        // Сохраняем обновленный эпик обратно в мапу
+        epics.put(epic.getId(), epic);
     }
 
-    public void deleteAllSubtask() {
+    public void deleteAllSubtasks() {
+        // Создаем копию списка ID подзадач, чтобы избежать модификации во время итерации
+        ArrayList<Integer> subtaskIds = new ArrayList<>(subtasks.keySet());
 
+        // Проходим по всем подзадачам
+        for (Integer subtaskId : subtaskIds) {
+            Subtask subtask = subtasks.remove(subtaskId);
+
+            if (subtask != null) {
+                int epicId = subtask.getEpicId();
+                Epic epic = epics.get(epicId);
+
+                if (epic != null) {
+                    // Удаляем подзадачу из списка эпика
+                    epic.removeSubtask(subtask);
+
+                    // Обновляем статус эпика
+                    Status newStatus = updateStatusEpic(epic);
+                    epic.setStatus(newStatus);
+
+                    // Сохраняем обновленный эпик
+                    epics.put(epic.getId(), epic);
+                }
+            }
+        }
+
+        // Очищаем коллекцию подзадач
         subtasks.clear();
     }
 
     public void removeSubtaskById(int id) {
+        // Получаем подзадачу по ID
+        Subtask subtask = subtasks.remove(id);
 
-        subtasks.remove(id);
+        if (subtask != null) {
+            // Получаем ID эпика, к которому принадлежала подзадача
+            int epicId = subtask.getEpicId();
+
+            // Находим соответствующий эпик
+            Epic epic = epics.get(epicId);
+
+            if (epic != null) {
+                // Удаляем подзадачу из списка эпика
+                epic.removeSubtask(subtask);
+
+                // Обновляем статус эпика
+                Status newStatus = updateStatusEpic(epic);
+                epic.setStatus(newStatus);
+
+                // Сохраняем обновленный эпик
+                epics.put(epic.getId(), epic);
+            }
+        }
     }
 
     public void updateSubtask(Subtask subtask) {
