@@ -3,7 +3,7 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Поехали!");
 
-        InMemoryTaskManager manager = new InMemoryTaskManager();
+        TaskManager manager = Managers.getDefault();
 
         Task task1 = new Task("Задача 1", "Описание задачи 1", manager, Status.NEW);
         Task task2 = new Task("Задача 2", "Описание задачи 2", manager, Status.NEW);

@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
     private static int taskCount = 1;
@@ -7,6 +8,10 @@ public class InMemoryTaskManager implements TaskManager {
     private HashMap<Integer, Task> tasks = new HashMap<>();
     private HashMap<Integer, Epic> epics = new HashMap<>();
     private HashMap<Integer, Subtask> subtasks = new HashMap<>();
+
+    // Поле для хранения истории просмотров
+    private List<Task> history = new ArrayList<>();
+    private static final int MAX_HISTORY_SIZE = 10;
 
     public int getCurrentTaskCount() {
         taskCount++;
@@ -18,7 +23,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public Task getTaskById(int id) {
-        return tasks.get(id);
+        Task task = tasks.get(id);
+        updateHistory(task);
+        return task;
     }
 
     public void createTask(Task task) {
@@ -45,7 +52,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public Epic getEpicById(int id) {
-        return epics.get(id);
+        Epic epic = epics.get(id);
+        updateHistory(epic);
+        return epic;
     }
 
     public void createEpic(Epic epic) {
@@ -116,7 +125,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public Subtask getSubtaskById(int id) {
-        return subtasks.get(id);
+        Subtask subtask = subtasks.get(id);
+        updateHistory(subtask);
+        return subtask;
     }
 
     public ArrayList<Subtask> getSubtasksByEpicId(int id) {
@@ -209,6 +220,25 @@ public class InMemoryTaskManager implements TaskManager {
             subtasks.put(subtask.getId(), subtask);
             Epic epic = getEpicById(subtask.getEpicId());
             updateEpic(epic);
+        }
+    }
+
+    public List<Task> getHistory(){
+        return new ArrayList<>(history);
+    }
+
+    // Вспомогательный метод для обновления истории
+    private void updateHistory(Task task) {
+        if (task == null) {
+            return;
+        }
+
+        // Добавляем задачу в конец списка
+        history.add(task);
+
+        // Если превышен лимит, удаляем самый старый элемент
+        if (history.size() > MAX_HISTORY_SIZE) {
+            history.remove(0);
         }
     }
 }
