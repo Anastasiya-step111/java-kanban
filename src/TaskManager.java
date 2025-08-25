@@ -62,10 +62,17 @@ public class TaskManager {
         }
     }
     private Status updateStatusEpic(Epic epic) {
+        ArrayList<Subtask> subtasks = epic.getSubtasks();
+
+        // Если подзадачи отсутствуют, возвращаем NEW
+        if (subtasks.isEmpty()) {
+            return Status.NEW;
+        }
+
         boolean allNew = true;
         boolean hasInProgress = false;
         boolean allDone = true;
-        ArrayList<Subtask> subtasks = epic.getSubtasks();
+
         for (Subtask subtask : subtasks) {
             Status subtaskStatus = subtask.getStatus();
             if (subtaskStatus != Status.NEW) {
@@ -178,15 +185,22 @@ public class TaskManager {
             Epic epic = epics.get(epicId);
 
             if (epic != null) {
+                // Сохраняем текущий статус эпика
+                Status oldStatus = epic.getStatus();
+
                 // Удаляем подзадачу из списка эпика
                 epic.removeSubtask(subtask);
 
                 // Обновляем статус эпика
                 Status newStatus = updateStatusEpic(epic);
+
+                // Сохраняем новый статус
                 epic.setStatus(newStatus);
 
-                // Сохраняем обновленный эпик
-                epics.put(epic.getId(), epic);
+                // Сохраняем обновленный эпик только если статус изменился
+                if (!oldStatus.equals(newStatus)) {
+                    epics.put(epic.getId(), epic);
+                }
             }
         }
     }
