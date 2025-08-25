@@ -3,7 +3,7 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Поехали!");
 
-        TaskManager manager = new TaskManager();
+        InMemoryTaskManager manager = new InMemoryTaskManager();
 
         Task task1 = new Task("Задача 1", "Описание задачи 1", manager, Status.NEW);
         Task task2 = new Task("Задача 2", "Описание задачи 2", manager, Status.NEW);
@@ -13,22 +13,23 @@ public class Main {
 
 
         Epic epic1 = new Epic("Эпик 1", "Описание эпика 1", manager, Status.NEW);
+        manager.createEpic(epic1);
+
         Subtask subtask1 = new Subtask("Подзадача 1.1", "Описание подзадачи 1.1", manager,
                 epic1.getId(), Status.NEW);
         Subtask subtask2 = new Subtask("Подзадача 1.2", "Описание подзадачи 1.2", manager,
                 epic1.getId(), Status.NEW);
-
-        manager.createEpic(epic1);
         manager.createSubtask(subtask1);
         manager.createSubtask(subtask2);
+
         epic1.getSubtasks().add(subtask1);
         epic1.getSubtasks().add(subtask2);
 
         Epic epic2 = new Epic("Эпик 2", "Описание эпика 2", manager, Status.NEW);
+        manager.createEpic(epic2);
+
         Subtask subtask3 = new Subtask("Подзадача 2.1", "Описание подзадачи 2.1", manager,
                 epic2.getId(), Status.NEW);
-
-        manager.createEpic(epic2);
         manager.createSubtask(subtask3);
         epic2.getSubtasks().add(subtask3);
 

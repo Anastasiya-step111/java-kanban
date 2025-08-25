@@ -6,7 +6,7 @@ public class Task {
 
     private final TaskManager taskManager;
 
-    public Task(String title, String description, TaskManager taskManager, Status status) {
+    public Task(String title, String description, InMemoryTaskManager taskManager, Status status) {
         this.title = title;
         this.description = description;
         this.taskManager = taskManager;
