@@ -7,14 +7,14 @@ public interface TaskManager {
 
         ArrayList<Task> getAllTasks();
         Task getTaskById(int id);
-        void createTask(Task task);
+        Task createTask(Task task);
         void updateTask(Task task);
         void deleteTask(int id);
         void deleteAllTasks();
 
         ArrayList<Epic> getAllEpics();
         Epic getEpicById(int id);
-        void createEpic(Epic epic);
+        Epic createEpic(Epic epic);
         void updateEpic(Epic epic);
         void deleteEpic(int id);
         void deleteAllEpics();
@@ -22,9 +22,11 @@ public interface TaskManager {
         ArrayList<Subtask> getAllSubtasks();
         Subtask getSubtaskById(int id);
         ArrayList<Subtask> getSubtasksByEpicId(int id);
-        void createSubtask(Subtask subtask);
+        Subtask createSubtask(Subtask subtask);
         void deleteAllSubtasks();
         void removeSubtaskById(int id);
         void updateSubtask(Subtask subtask);
         List<Task> getHistory();
+
+        HistoryManager getHistoryManager();
 }

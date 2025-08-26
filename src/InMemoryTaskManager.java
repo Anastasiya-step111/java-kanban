@@ -13,6 +13,7 @@ public class InMemoryTaskManager implements TaskManager {
     private HistoryManager historyManager;
 
     public InMemoryTaskManager() {
+
         this.historyManager = Managers.getDefaultHistory();
     }
 
@@ -20,6 +21,11 @@ public class InMemoryTaskManager implements TaskManager {
     public int getCurrentTaskCount() {
         taskCount++;
         return taskCount;
+    }
+
+    @Override
+    public HistoryManager getHistoryManager() {
+        return historyManager;
     }
 
     @Override
