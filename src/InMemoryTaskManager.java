@@ -37,8 +37,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createTask(Task task) {
-        task.setId(getCurrentTaskCount());
-        tasks.put(task.getId(), task);
+        int id = getCurrentTaskCount();
+        task.setId(id);
+        tasks.put(id, task);
     }
 
     @Override
@@ -67,6 +68,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Epic getEpicById(int id) {
         Epic epic = epics.get(id);
         if (epic != null) {
+            System.out.println("Получен эпик с ID: " + id + ", статус: " + epic.getStatus());
             historyManager.add(epic);
         }
         return epic;
@@ -74,8 +76,16 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createEpic(Epic epic) {
-        epic.setId(getCurrentTaskCount());
-        epics.put(epic.getId(), epic);
+        int id = getCurrentTaskCount();
+        epic.setId(id);
+        // epics.put(id, epic);
+        // Проверяем исходный статус
+        System.out.println("Перед сохранением статус: " + epic.getStatus());
+
+        epics.put(id, epic);
+
+        // Проверяем статус после сохранения
+        System.out.println("После сохранения статус: " + epic.getStatus());
     }
 
     @Override
@@ -92,32 +102,30 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-        boolean allNew = true;
-        boolean hasInProgress = false;
-        boolean allDone = true;
+        int subtaskCount = subtasks.size();
+        int subtaskCountNew = 0;
+        int subtaskCountInProgress = 0;
+        int subtaskCountDone = 0;
 
         for (Subtask subtask : subtasks) {
             Status subtaskStatus = subtask.getStatus();
-            if (subtaskStatus != Status.NEW) {
-                allNew = false;
-            }
-            if (subtaskStatus == Status.IN_PROGRESS) {
-                hasInProgress = true;
-            }
-            if (subtaskStatus == Status.DONE) {
-                allDone = false;
+
+            if (subtaskStatus == Status.NEW) {
+                subtaskCountNew++;
+            } else if (subtaskStatus == Status.IN_PROGRESS) {
+                subtaskCountInProgress++;
+            } else if (subtaskStatus == Status.DONE) {
+                subtaskCountDone++;
             }
         }
 
         Status newStatus;
-        if (hasInProgress) {
-            newStatus = Status.IN_PROGRESS;
-        } else if (allDone) {
+        if (subtaskCountNew == subtaskCount) {
+            newStatus = Status.NEW;
+        } else if (subtaskCountDone == subtaskCount) {
             newStatus = Status.DONE;
-        } else if (allNew) {
-            newStatus = Status.NEW;
         } else {
-            newStatus = Status.NEW;
+            newStatus = Status.IN_PROGRESS;
         }
 
         epic.setStatus(newStatus);
@@ -168,8 +176,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createSubtask(Subtask subtask) {
-        subtask.setId(getCurrentTaskCount());
-        subtasks.put(subtask.getId(), subtask);
+        int id = getCurrentTaskCount();
+        subtask.setId(id);
+        subtasks.put(id, subtask);
 
         int epicId = subtask.getEpicId();
         Epic epic = epics.get(epicId);

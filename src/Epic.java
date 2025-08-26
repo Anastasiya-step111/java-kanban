@@ -20,4 +20,12 @@ public class Epic extends Task {
         subtasks.remove(subtask);
     }
 
+    @Override
+    public String toString() {
+        return String.format("Эпик №%d: %s\n" +
+                        "Статус: %s\n" +
+                        "Описание: %s\n" +
+                        "Количество подзадач: %d",
+                getId(), getTitle(), getStatus(), getDescription(), getSubtasks().size());
+    }
 }

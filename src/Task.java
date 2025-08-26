@@ -10,7 +10,6 @@ public class Task {
         this.title = title;
         this.description = description;
         this.taskManager = taskManager;
-        this.id = taskManager.getCurrentTaskCount();
         this.status = status;
     }
 
@@ -44,6 +43,14 @@ public class Task {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Задача №%d: %s\n" +
+                        "Статус: %s\n" +
+                        "Описание: %s",
+                getId(), getTitle(), getStatus(), getDescription());
     }
 }
 

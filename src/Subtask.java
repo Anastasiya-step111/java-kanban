@@ -13,4 +13,13 @@ public class Subtask extends Task {
     public void setEpicId(int epicId) {
         this.epicId = epicId;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Подзадача №%d: %s\n" +
+                        "Статус: %s\n" +
+                        "Описание: %s\n" +
+                        "Принадлежит эпику №%d",
+                getId(), getTitle(), getStatus(), getDescription(), getEpicId());
+    }
 }
