@@ -1,6 +1,8 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -64,9 +66,96 @@ class TaskTest {
 
     @Test
     void testEqualsById() {
-        // экземпляры класса таск равны если их id одинаков
         assertEquals(task1.getId(), task3.getId(), "ID одинаковых экземпляров класса Task должны совпадать");
         assertTrue(task1.equals(task3), "Задачи с одинаковым ID должны быть равны");
+    }
+
+    @Test
+    void testUpdateTask() {
+        int taskId = task1.getId();
+        String originalTitle = task1.getTitle();
+        String originalDescription = task1.getDescription();
+        Status originalStatus = task1.getStatus();
+
+        String newTitle = "Купить продукты и приготовить ужин";
+        String newDescription = "Хлеб, яйца, масло, овощи";
+        Status newStatus = Status.IN_PROGRESS;
+
+        Task updatedTask = new Task(newTitle, newDescription, manager, newStatus);
+        updatedTask.setId(taskId);
+
+        manager.updateTask(updatedTask);
+
+        Task updatedFromManager = manager.getTaskById(taskId);
+
+        assertNotNull(updatedFromManager, "Задача должна существовать после обновления");
+        assertEquals(updatedTask.getId(), updatedFromManager.getId(), "ID должен совпадать");
+        assertEquals(newTitle, updatedFromManager.getTitle(), "Название должно быть обновлено");
+        assertEquals(newDescription, updatedFromManager.getDescription(), "Описание должно быть обновлено");
+        assertEquals(newStatus, updatedFromManager.getStatus(), "Статус должен быть обновлен");
+
+        assertNotEquals(originalTitle, updatedFromManager.getTitle(), "Исходное название должно отличаться");
+        assertNotEquals(originalDescription, updatedFromManager.getDescription(), "Исходное описание должно отличаться");
+        assertNotEquals(originalStatus, updatedFromManager.getStatus(), "Исходный статус должен отличаться");
+    }
+
+    @Test
+    void testDeleteTask() {
+        int taskId = task1.getId();
+        ArrayList<Task> allTasks = manager.getAllTasks();
+
+        boolean taskExists = false;
+        for (Task task : allTasks) {
+            if (task.getId() == taskId) {
+                taskExists = true;
+                break;
+            }
+        }
+        assertTrue(taskExists, "Задача должна существовать до удаления");
+
+        int initialTaskCount = allTasks.size();
+
+        manager.deleteTask(taskId);
+
+        ArrayList<Task> updatedTasks = manager.getAllTasks();
+
+        boolean taskStillExists = false;
+        for (Task task : updatedTasks) {
+            if (task.getId() == taskId) {
+                taskStillExists = true;
+                break;
+            }
+        }
+        assertFalse(taskStillExists, "Задача должна быть удалена");
+        assertEquals(initialTaskCount - 1, updatedTasks.size(), "Количество задач должно уменьшиться на 1");
+        assertNull(manager.getTaskById(taskId), "Должны получить null для удалённой задачи");
+        manager.deleteTask(9999); // произвольный несуществующий ID
+        assertEquals(initialTaskCount - 1, manager.getAllTasks().size(), "Удаление несуществующей задачи не должно менять размер");
+    }
+
+    @Test
+    void testDeleteAllTasks() {
+        int initialTaskCount = manager.getAllTasks().size();
+        assertTrue(initialTaskCount > 0, "Изначально должно быть хотя бы несколько задач");
+
+        manager.createTask(new Task("Новая задача 1", "Описание 1", manager, Status.NEW));
+        manager.createTask(new Task("Новая задача 2", "Описание 2", manager, Status.IN_PROGRESS));
+
+        int updatedTaskCount = manager.getAllTasks().size();
+        assertTrue(updatedTaskCount > initialTaskCount, "Количество задач должно увеличиться после создания новых");
+
+        manager.deleteAllTasks();
+
+        assertTrue(manager.getAllTasks().isEmpty(), "После удаления всех задач список должен быть пустым");
+        assertEquals(0, manager.getAllTasks().size(), "Размер списка задач должен быть равен 0");
+
+        manager.deleteAllTasks();
+        assertTrue(manager.getAllTasks().isEmpty(), "Повторное удаление не должно нарушить состояние");
+
+        Task newTask = manager.createTask(new Task("Проверка после очистки", "Тест", manager, Status.NEW));
+        assertFalse(manager.getAllTasks().isEmpty(), "После создания новой задачи список не должен быть пустым");
+        assertEquals(1, manager.getAllTasks().size(), "Должна быть только одна задача");
+        assertNotNull(manager.getTaskById(newTask.getId()), "Созданная задача должна быть доступна");
     }
 }
 
