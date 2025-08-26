@@ -2,11 +2,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class EpicTest {
     TaskManager manager = Managers.getDefault();
+    HistoryManager historyManager = manager.getHistoryManager();
     Epic epic1;
     Epic epic2;
     Epic epic3;
@@ -91,5 +93,52 @@ class EpicTest {
                 "Равные объекты должны иметь одинаковые хэш-коды");
         assertNotEquals(epic1.hashCode(), epic2.hashCode(),
                 "Разные объекты должны иметь разные хэш-коды");
+    }
+
+    @Test
+    void testCreateEpic() {
+        assertNotNull(epic1, "Эпик должен быть создан");
+        assertNotEquals(0, epic1.getId(), "ID эпика не должен быть нулевым");
+        assertEquals(epic1.getId(), epic3.getId(), "Id должны совпасть");
+
+        Epic epicWithEmptyDescription = new Epic("Пустой эпик", "", manager, Status.NEW);
+        Epic createdEmptyDescriptionEpic = manager.createEpic(epicWithEmptyDescription);
+        assertNotNull(createdEmptyDescriptionEpic, "Должен создать эпик с пустым описанием");
+
+        Epic epicWithEmptyTitle = new Epic("", "Описание пустого эпика", manager, Status.NEW);
+        Epic createdEmptyTitleEpic = manager.createEpic(epicWithEmptyTitle);
+        assertNotNull(createdEmptyTitleEpic, "Должен создать эпик с пустым названием");
+
+        ArrayList<Epic> finalList = manager.getAllEpics();
+        assertTrue(finalList.contains(epic1), "Новый эпик должен быть в системе");
+        assertTrue(finalList.contains(createdEmptyDescriptionEpic), "Эпик с пустым описанием должен быть в системе");
+        assertTrue(finalList.contains(createdEmptyTitleEpic), "Эпик с пустым названием должен быть в системе");
+    }
+
+    @Test
+    void testGetEpicById() {
+        Epic retrievedEpic1 = manager.getEpicById(epic1.getId());
+        assertNotNull(retrievedEpic1, "Должен вернуть существующий эпик");
+        assertEquals(epic1, retrievedEpic1, "Полученный эпик должен совпадать с исходным");
+
+        Epic retrievedEpic2 = manager.getEpicById(epic2.getId());
+        assertNotNull(retrievedEpic2, "Должен вернуть существующий эпик");
+        assertEquals(epic2, retrievedEpic2, "Полученный эпик должен совпадать с исходным");
+
+        Epic nonExistingEpic = manager.getEpicById(9999);
+        assertNull(nonExistingEpic, "Должен вернуть null для несуществующего ID");
+
+        Epic zeroIdEpic = manager.getEpicById(0);
+        assertNull(zeroIdEpic, "Должен вернуть null для ID=0");
+
+        assertEquals(Status.NEW, retrievedEpic1.getStatus(), "Статус эпика должен быть корректным");
+
+        manager.deleteEpic(epic1.getId());
+        Epic deletedEpic = manager.getEpicById(epic1.getId());
+        assertNull(deletedEpic, "После удаления должен возвращать null");
+
+        List<Task> historyAfterGet = historyManager.getHistory();
+        assertEquals(2, historyAfterGet.size(), "В истории должно быть два элемента");
+        assertTrue(historyAfterGet.contains(epic2), "Полученный эпик должен быть в истории");
     }
 }
