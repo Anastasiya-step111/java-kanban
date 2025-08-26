@@ -30,7 +30,7 @@ public class Main {
         manager.getSubtaskById(subtask1.getId());
         manager.getSubtaskById(subtask2.getId());
 
-        Epic epic2 = new Epic("Разобраться с ошибкой по коробке в бехе", "Не горит", manager, Status.NEW);
+        Epic epic2 = new Epic("Разобраться с ошибкой по коробке", "Не горит", manager, Status.NEW);
         manager.createEpic(epic2);
         manager.getEpicById(epic2.getId());
 
