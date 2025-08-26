@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class InMemoryTaskManager implements TaskManager {
     private static int taskCount = 1;
@@ -36,10 +37,21 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void createTask(Task task) {
+    public Task createTask(Task task) {
+        // Ищем существующую задачу
+        for (Task existingTask : tasks.values()) {
+            if ((Objects.equals(existingTask.getDescription(), task.getDescription()) &&
+                    Objects.equals(existingTask.getTitle(), task.getTitle()))) {
+                // Возвращаем существующую задачу вместо создания новой
+                return existingTask;
+            }
+        }
+
+        // Если задача не найдена, создаем новую
         int id = getCurrentTaskCount();
         task.setId(id);
         tasks.put(id, task);
+        return task; // Возвращаем созданную задачу
     }
 
     @Override
@@ -75,10 +87,20 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void createEpic(Epic epic) {
+    public Epic createEpic(Epic epic) {
+        // Ищем существующий Epic
+        for (Epic existingEpic : epics.values()) {
+            if ( Objects.equals(existingEpic.getDescription(), epic.getDescription()) &&
+                    Objects.equals(existingEpic.getTitle(), epic.getTitle())) {
+                // Возвращаем существующий Epic
+                return existingEpic;
+            }
+        }
+
+        // Если не нашли, создаем новый
         int id = getCurrentTaskCount();
         epic.setId(id);
-        // epics.put(id, epic);
+
         // Проверяем исходный статус
         System.out.println("Перед сохранением статус: " + epic.getStatus());
 
@@ -86,6 +108,8 @@ public class InMemoryTaskManager implements TaskManager {
 
         // Проверяем статус после сохранения
         System.out.println("После сохранения статус: " + epic.getStatus());
+
+        return epic; // Возвращаем созданный Epic
     }
 
     @Override
@@ -175,11 +199,22 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void createSubtask(Subtask subtask) {
+    public Subtask createSubtask(Subtask subtask) {
+        // Ищем существующий Subtask
+        for (Subtask existingSubtask : subtasks.values()) {
+            if (Objects.equals(existingSubtask.getTitle(), subtask.getTitle()) &&
+                    Objects.equals(existingSubtask.getDescription(), subtask.getDescription()) &&
+                    existingSubtask.getEpicId() == subtask.getEpicId()) {
+                return existingSubtask;
+            }
+        }
+
+        // Если не нашли, создаем новый
         int id = getCurrentTaskCount();
         subtask.setId(id);
         subtasks.put(id, subtask);
 
+        // Обновляем связанный Epic
         int epicId = subtask.getEpicId();
         Epic epic = epics.get(epicId);
 
@@ -187,7 +222,10 @@ public class InMemoryTaskManager implements TaskManager {
             epic.addSubtask(subtask);
             updateEpic(epic);
         }
+
+        return subtask; // Возвращаем созданный Subtask
     }
+
 
     @Override
     public void deleteAllSubtasks() {
