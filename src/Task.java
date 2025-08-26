@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class Task {
     private String title;
     private String description;
@@ -51,6 +53,25 @@ public class Task {
                         "Статус: %s\n" +
                         "Описание: %s",
                 getId(), getTitle(), getStatus(), getDescription());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true; // Проверка на идентичность
+        if (o == null || getClass() != o.getClass()) return false; // Проверка на null и тип
+
+        Task task = (Task) o; // Приведение типа
+
+        // Сравнение всех значимых полей
+        return id == task.id &&
+                status == task.status &&
+                Objects.equals(title, task.title) &&
+                Objects.equals(description, task.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, description, status);
     }
 }
 
