@@ -29,6 +29,12 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
+    public List<Task> getHistory() {
+
+        return historyManager.getHistory();
+    }
+
+    @Override
     public ArrayList<Task> getAllTasks() {
 
         return new ArrayList<>(tasks.values());
@@ -149,6 +155,10 @@ public class InMemoryTaskManager implements TaskManager {
                 subtaskCountDone++;
             }
         }
+
+        System.out.println("Количество новых подзадач = " + subtaskCountNew +
+                "Количество прогресс подзадач = " + subtaskCountInProgress +
+                "Количество завершенных подзадач = " + subtaskCountDone );
 
         Status newStatus;
         if (subtaskCountNew == subtaskCount) {
@@ -278,6 +288,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateSubtask(Subtask subtask) {
         if (subtasks.containsKey(subtask.getId())) {
             subtasks.put(subtask.getId(), subtask);
+
             int epicId = subtask.getEpicId();
             Epic epic = epics.get(epicId);
 
@@ -287,8 +298,4 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    @Override
-    public List<Task> getHistory() {
-        return historyManager.getHistory();
-    }
 }
