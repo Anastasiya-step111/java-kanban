@@ -6,7 +6,7 @@ public class Task {
     private int id;
     private Status status;
 
-    private final TaskManager taskManager;
+    protected final TaskManager taskManager;
 
     public Task(String title, String description, TaskManager taskManager, Status status) {
         this.title = title;

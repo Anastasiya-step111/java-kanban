@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TaskTest {
     TaskManager manager = Managers.getDefault();
+    HistoryManager historyManager = manager.getHistoryManager();
     Task task1;
     Task task2;
     Task task3;
