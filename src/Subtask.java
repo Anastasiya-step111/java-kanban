@@ -13,6 +13,18 @@ public class Subtask extends Task {
     }
 
     public void setEpicId(int epicId) {
+        boolean found = false;
+        for (Epic epic : taskManager.getAllEpics()) {
+            if (epic.getId() == epicId) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            throw new IllegalArgumentException("Epic с указанным ID не существует");
+        }
+
         this.epicId = epicId;
     }
 
