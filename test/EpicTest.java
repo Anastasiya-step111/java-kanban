@@ -11,30 +11,32 @@ class EpicTest {
     HistoryManager historyManager = manager.getHistoryManager();
     Epic epic1;
     Epic epic2;
-    Epic epic3;
+    Epic epicDuplicate1;
+
     Subtask subtask1;
     Subtask subtask2;
     Subtask subtask3;
-    Subtask subtask4;
+    Subtask subtaskDuplicate1;
+
 
     @BeforeEach
     public void beforeEach() {
         epic1 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача", manager,
                 Status.NEW));
+        epicDuplicate1 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача", manager,
+                Status.NEW));
         epic2 = manager.createEpic(new Epic("Разобраться с ошибкой по коробке", "Не горит", manager,
                 Status.NEW));
-        epic3 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача", manager,
-                Status.NEW));
+
 
         subtask1 = manager.createSubtask(new Subtask("Найти репетитора", "Почитать отзывы", manager,
                 epic1.getId(), Status.NEW));
+        subtaskDuplicate1 = manager.createSubtask(new Subtask("Найти репетитора", "Почитать отзывы", manager,
+                epicDuplicate1.getId(), Status.NEW));
         subtask2 = manager.createSubtask(new Subtask("Разбираться в IDEA",
                 "Переводить все встреченные слова", manager, epic1.getId(), Status.NEW));
         subtask3 = manager.createSubtask(new Subtask("Изучить вопрос на драйв2",
                 "Сделать список вариантов", manager, epic2.getId(), Status.NEW));
-        subtask4 = manager.createSubtask(new Subtask("Найти репетитора", "Почитать отзывы", manager,
-                epic3.getId(), Status.NEW));
-
     }
 
     @Test
@@ -59,6 +61,15 @@ class EpicTest {
     }
 
     @Test
+    void testCannotAddEpicToItselfAsSubtask() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            epic1.addSubtask(epic1);
+        }, "Должна быть ошибка при попытке добавить эпик как подзадачу самому себе");
+
+        assertEquals(2, epic1.getSubtasks().size(), "Список подзадач не должен измениться");
+    }
+
+    @Test
     void testRemoveSubtask() {
         ArrayList<Subtask> initialList = epic1.getSubtasks();
         assertEquals(2, initialList.size(), "Начальный размер должен быть 2");
@@ -78,8 +89,9 @@ class EpicTest {
     @Test
     void testEpicEquals() {
         assertTrue(epic1.equals(epic1), "Объект должен быть равен самому себе");
-        assertTrue(epic1.equals(epic3), "Идентичные эпики должны быть равны");
-        assertTrue(epic3.equals(epic1), "Равенство должно быть симметричным");
+
+        assertTrue(epic1.equals(epicDuplicate1), "Идентичные эпики должны быть равны");
+        assertTrue(epicDuplicate1.equals(epic1), "Равенство должно быть симметричным");
 
         assertFalse(epic1.equals(null), "Объект не должен быть равен null");
         assertFalse(epic1.equals(new Object()), "Объект другого типа не должен быть равен");
@@ -89,7 +101,7 @@ class EpicTest {
 
     @Test
     void testEpicHashCode() {
-        assertEquals(epic1.hashCode(), epic3.hashCode(),
+        assertEquals(epic1.hashCode(), epicDuplicate1.hashCode(),
                 "Равные объекты должны иметь одинаковые хэш-коды");
         assertNotEquals(epic1.hashCode(), epic2.hashCode(),
                 "Разные объекты должны иметь разные хэш-коды");
@@ -99,7 +111,7 @@ class EpicTest {
     void testCreateEpic() {
         assertNotNull(epic1, "Эпик должен быть создан");
         assertNotEquals(0, epic1.getId(), "ID эпика не должен быть нулевым");
-        assertEquals(epic1.getId(), epic3.getId(), "Id должны совпасть");
+        assertEquals(epic1.getId(), epicDuplicate1.getId(), "Id должны совпасть");
 
         Epic epicWithEmptyDescription = new Epic("Пустой эпик", "", manager, Status.NEW);
         Epic createdEmptyDescriptionEpic = manager.createEpic(epicWithEmptyDescription);
