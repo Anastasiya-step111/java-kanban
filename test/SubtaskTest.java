@@ -7,8 +7,8 @@ import java.util.ArrayList;
 
 
 class SubtaskTest {
-        TaskManager manager = Managers.getDefault();
-        HistoryManager historyManager = manager.getHistoryManager();
+    TaskManager manager = Managers.getDefault();
+    HistoryManager historyManager = manager.getHistoryManager();
         Epic epic1;
         Epic epic2;
 
