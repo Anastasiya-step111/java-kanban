@@ -25,7 +25,7 @@ public interface TaskManager {
         Subtask createSubtask(Subtask subtask);
         void deleteAllSubtasks();
         void removeSubtaskById(int id);
-        void updateSubtask(Subtask subtask);
+        void updateSubtask(Subtask subtask, int id);
         List<Task> getHistory();
 
         HistoryManager getHistoryManager();

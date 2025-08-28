@@ -153,4 +153,56 @@ class EpicTest {
         assertEquals(2, historyAfterGet.size(), "В истории должно быть два элемента");
         assertTrue(historyAfterGet.contains(epic2), "Полученный эпик должен быть в истории");
     }
+
+    @Test
+    void testUpdateEpicStatus() {
+        assertEquals(Status.NEW, epic1.getStatus(), "Исходный статус эпика должен быть NEW");
+
+        String newTitle1 = "Обновленное название";
+        String newDescription1 = "Новое описание";
+        Status newStatus1 = Status.IN_PROGRESS;
+        int epicId1 = subtask1.getEpicId();
+
+        Subtask updatedSubtask1 = new Subtask(
+                newTitle1,
+                newDescription1,
+                manager,
+                epicId1,
+                newStatus1
+        );
+
+        manager.updateSubtask(updatedSubtask1, subtask1.getId());
+        assertEquals(Status.IN_PROGRESS, epic1.getStatus(), "Статус эпика должен обновиться");
+
+        String newTitle2 = "Обновленное название";
+        String newDescription2 = "Новое описание";
+        Status newStatus2 = Status.DONE;
+
+        Subtask updatedSubtask2 = new Subtask(
+                newTitle2,
+                newDescription2,
+                manager,
+                subtask2.getEpicId(),
+                newStatus2
+        );
+
+        manager.updateSubtask(updatedSubtask2, subtask2.getId());
+        assertEquals(Status.IN_PROGRESS, epic1.getStatus(), "Статус эпика не должен измениться");
+
+        String newTitle3 = "Обновленное название";
+        String newDescription3 = "Новое описание";
+        Status newStatus3 = Status.DONE;
+
+        Subtask updatedSubtask3 = new Subtask(
+                newTitle3,
+                newDescription3,
+                manager,
+                subtask1.getEpicId(),
+                newStatus3
+        );
+
+        manager.updateSubtask(updatedSubtask3, subtask1.getId());
+        assertEquals(2, epic1.getSubtasks().size(), "подзадач должно быть 2");
+        assertEquals(Status.DONE, epic1.getStatus(), "Статус эпика должен обновиться");
+    }
 }

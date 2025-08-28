@@ -49,20 +49,18 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task createTask(Task task) {
-        // Ищем существующую задачу
         for (Task existingTask : tasks.values()) {
             if ((Objects.equals(existingTask.getDescription(), task.getDescription()) &&
                     Objects.equals(existingTask.getTitle(), task.getTitle()))) {
-                // Возвращаем существующую задачу вместо создания новой
+
                 return existingTask;
             }
         }
 
-        // Если задача не найдена, создаем новую
         int id = getCurrentTaskCount();
         task.setId(id);
         tasks.put(id, task);
-        return task; // Возвращаем созданную задачу
+        return task;
     }
 
     @Override
@@ -74,16 +72,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteTask(int id) {
+
         tasks.remove(id);
     }
 
     @Override
     public void deleteAllTasks() {
+
         tasks.clear();
     }
 
     @Override
     public ArrayList<Epic> getAllEpics() {
+
         return new ArrayList<>(epics.values());
     }
 
@@ -99,28 +100,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic createEpic(Epic epic) {
-        // Ищем существующий Epic
         for (Epic existingEpic : epics.values()) {
             if ( Objects.equals(existingEpic.getDescription(), epic.getDescription()) &&
                     Objects.equals(existingEpic.getTitle(), epic.getTitle())) {
-                // Возвращаем существующий Epic
+
                 return existingEpic;
             }
         }
 
-        // Если не нашли, создаем новый
         int id = getCurrentTaskCount();
         epic.setId(id);
-
-        // Проверяем исходный статус
-        System.out.println("Перед сохранением статус: " + epic.getStatus());
-
         epics.put(id, epic);
 
-        // Проверяем статус после сохранения
-        System.out.println("После сохранения статус: " + epic.getStatus());
-
-        return epic; // Возвращаем созданный Epic
+        return epic;
     }
 
     @Override
@@ -153,10 +145,6 @@ public class InMemoryTaskManager implements TaskManager {
                 subtaskCountDone++;
             }
         }
-
-        System.out.println("Количество новых подзадач = " + subtaskCountNew +
-                "Количество прогресс подзадач = " + subtaskCountInProgress +
-                "Количество завершенных подзадач = " + subtaskCountDone );
 
         Status newStatus;
         if (subtaskCountNew == subtaskCount) {
@@ -215,7 +203,6 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Subtask createSubtask(Subtask subtask) {
-        // Ищем существующий Subtask
         for (Subtask existingSubtask : subtasks.values()) {
             if (Objects.equals(existingSubtask.getTitle(), subtask.getTitle()) &&
                     Objects.equals(existingSubtask.getDescription(), subtask.getDescription()) &&
@@ -224,12 +211,10 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
 
-        // Если не нашли, создаем новый
         int id = getCurrentTaskCount();
         subtask.setId(id);
         subtasks.put(id, subtask);
 
-        // Обновляем связанный Epic
         int epicId = subtask.getEpicId();
         Epic epic = epics.get(epicId);
 
@@ -238,7 +223,7 @@ public class InMemoryTaskManager implements TaskManager {
             updateEpic(epic);
         }
 
-        return subtask; // Возвращаем созданный Subtask
+        return subtask;
     }
 
 
@@ -283,16 +268,19 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateSubtask(Subtask subtask) {
-        if (subtasks.containsKey(subtask.getId())) {
-            subtasks.put(subtask.getId(), subtask);
+    public void updateSubtask(Subtask updatedSubtask, int id) {
+        int epicId = updatedSubtask.getEpicId();
+        Epic epic = epics.get(epicId);
 
-            int epicId = subtask.getEpicId();
-            Epic epic = epics.get(epicId);
-
-            updateEpic(epic);
-
+        ArrayList<Subtask> oldSubtasks = epic.getSubtasks();
+        for (Subtask oldSubtask : oldSubtasks) {
+            if (oldSubtask.getId() == id) {
+                oldSubtasks.remove(oldSubtask);
+            }
         }
+        updatedSubtask.setId(id);
+        subtasks.put(id, updatedSubtask);
+        epic.addSubtask(updatedSubtask);
+        updateEpic(epic);
     }
-
 }

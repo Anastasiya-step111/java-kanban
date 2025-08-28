@@ -10,32 +10,28 @@ public class Epic extends Task {
     }
 
     public ArrayList<Subtask> getSubtasks() {
+
         return subtasks;
     }
 
-    // public void addSubtask(Subtask subtask) {
-    //    subtasks.add(subtask); }
-
     public void addSubtask(Object subtask) {
-        // Проверяем, что добавляемый объект не является самим эпиком
         if (subtask == this) {
             throw new IllegalArgumentException("Нельзя добавить эпик как подзадачу самому себе");
         }
 
-        // Проверяем, что добавляемый объект является подзадачей
         if (!(subtask instanceof Subtask)) {
             throw new IllegalArgumentException("Можно добавлять только подзадачи");
         }
 
         Subtask task = (Subtask) subtask;
 
-        // Добавляем только если подзадачи еще нет в списке
         if (!subtasks.contains(task)) {
             subtasks.add(task);
         }
     }
 
     public void removeSubtask(Subtask subtask) {
+
         subtasks.remove(subtask);
     }
 

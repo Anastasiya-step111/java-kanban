@@ -39,6 +39,7 @@ class InMemoryTaskManagerTest {
         HistoryManager historyManager = manager.getHistoryManager();
         Subtask subtask1 = manager.createSubtask(new Subtask("Подзадача тест", "Описание подзадачи",
                 manager, 1, Status.NEW));
+        Subtask testSubtask1 = manager.getSubtaskById(subtask1.getId());
         List<Task> historyAfterGet = historyManager.getHistory();
         assertEquals(1, historyAfterGet.size(), "В истории должен быть 1 элемент");
         assertTrue(historyAfterGet.contains(subtask1), "Полученная подзадача должна быть в истории");

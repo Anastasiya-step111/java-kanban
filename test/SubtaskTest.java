@@ -9,27 +9,27 @@ import java.util.ArrayList;
 class SubtaskTest {
     TaskManager manager = Managers.getDefault();
     HistoryManager historyManager = manager.getHistoryManager();
-        Epic epic1;
-        Epic epic2;
+    Epic epic1;
+    Epic epic2;
 
-        Subtask subtask1;
-        Subtask subtask2;
-        Subtask subtask3;
+    Subtask subtask1;
+    Subtask subtask2;
+    Subtask subtask3;
 
-        @BeforeEach
-        public void beforeEach() {
-            epic1 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача", manager,
-                    Status.NEW));
-            epic2 = manager.createEpic(new Epic("Разобраться с ошибкой по коробке", "Не горит", manager,
-                    Status.NEW));
+    @BeforeEach
+    public void beforeEach() {
+        epic1 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача", manager,
+                Status.NEW));
+        epic2 = manager.createEpic(new Epic("Разобраться с ошибкой по коробке", "Не горит", manager,
+                Status.NEW));
 
-            subtask1 = manager.createSubtask(new Subtask("Найти репетитора", "Почитать отзывы", manager,
-                    epic1.getId(), Status.NEW));
-            subtask2 = manager.createSubtask(new Subtask("Разбираться в IDEA",
-                    "Переводить все встреченные слова", manager, epic1.getId(), Status.NEW));
-            subtask3 = manager.createSubtask(new Subtask("Изучить вопрос на драйв2",
-                    "Сделать список вариантов", manager, epic2.getId(), Status.NEW));
-        }
+        subtask1 = manager.createSubtask(new Subtask("Найти репетитора", "Почитать отзывы", manager,
+                epic1.getId(), Status.NEW));
+        subtask2 = manager.createSubtask(new Subtask("Разбираться в IDEA",
+                "Переводить все встреченные слова", manager, epic1.getId(), Status.NEW));
+        subtask3 = manager.createSubtask(new Subtask("Изучить вопрос на драйв2",
+                "Сделать список вариантов", manager, epic2.getId(), Status.NEW));
+    }
 
     @Test
     void testEpicEquals() {
@@ -55,17 +55,20 @@ class SubtaskTest {
         subtask1.setEpicId(epic1.getId());
         assertEquals(epic1.getId(), subtask1.getEpicId(), "Валидный Id должен добавляться");
 
-        assertThrows(IllegalArgumentException.class, () -> { subtask2.setEpicId(9999); // Не существующий ID
+        assertThrows(IllegalArgumentException.class, () -> {
+            subtask2.setEpicId(9999); // Не существующий ID
         }, "Должна быть ошибка для несуществующего ID");
 
         subtask2.setEpicId(epic2.getId());
         assertEquals(epic2.getId(), subtask2.getEpicId(), "Id существующего эпика должно добавляться");
 
-        assertThrows(IllegalArgumentException.class, () -> { subtask3.setEpicId(0);
+        assertThrows(IllegalArgumentException.class, () -> {
+            subtask3.setEpicId(0);
         }, "Должна быть ошибка для нулевого ID");
 
         int idSubtask3 = subtask2.getId();
-        assertThrows(IllegalArgumentException.class, () -> { subtask2.setEpicId(idSubtask3);
+        assertThrows(IllegalArgumentException.class, () -> {
+            subtask2.setEpicId(idSubtask3);
         }, "Должна быть ошибка при добавлении Id принадлежащем объекту Subtask");
     }
 
@@ -196,18 +199,11 @@ class SubtaskTest {
                 subtask1.getEpicId(),
                 newStatus
         );
-        updatedSubtask.setId(subtask1.getId());
 
-        manager.updateSubtask(updatedSubtask);
+        manager.updateSubtask(updatedSubtask, subtask1.getId());
 
         Subtask retrievedSubtask = manager.getSubtaskById(subtask1.getId());
         assertNotNull(retrievedSubtask, "Подзадача должна существовать после обновления");
-        System.out.println("retrievedSubtask.getStatus()=" + retrievedSubtask.getStatus() +
-                "   subtask1.getStatus()= "  +subtask1.getStatus() +
-                "  retrievedSubtask.getId() = " + retrievedSubtask.getId() +
-                "subtask1.getId() = " + subtask1.getId() +
-                "  retrievedSubtask.getEpicId() = " + retrievedSubtask.getEpicId() +
-                "subtask1.getEpicId() = " + subtask1.getEpicId() );
 
         assertEquals(newTitle, retrievedSubtask.getTitle(), "Название не обновилось");
         assertEquals(newDescription, retrievedSubtask.getDescription(), "Описание не обновилось");
@@ -216,56 +212,9 @@ class SubtaskTest {
         assertNotEquals(originalTitle, retrievedSubtask.getTitle());
         assertNotEquals(originalDescription, retrievedSubtask.getDescription());
 
+        Epic retrievedEpic = manager.getEpicById(retrievedSubtask.getEpicId());
 
-        // Проверяем обновление статуса эпика
-        assertEquals(Status.IN_PROGRESS, epic1.getStatus(), "Статус эпика должен обновиться");
+        assertEquals(Status.IN_PROGRESS, retrievedEpic.getStatus(), "Статус эпика должен обновиться");
     }
 
-    @Test
-    void testUpdateSubtask_EpicStatus() {
-            int epicId = epic1.getId();
-            int subtaskId = subtask1.getId();
-            int subtaskEpicId = subtask1.getEpicId();
-
-        assertEquals(Status.NEW, epic1.getStatus(), "Исходный статус эпика должен быть NEW");
-
-        String originalTitle = subtask1.getTitle();
-        String originalDescription = subtask1.getDescription();
-
-        String newTitle = "Обновленное название";
-        String newDescription = "Новое описание";
-        Status newStatus = Status.DONE;
-
-        Subtask updatedSubtask = new Subtask(
-                newTitle,
-                newDescription,
-                manager,
-                subtaskEpicId,
-                newStatus
-        );
-        updatedSubtask.setId(subtaskId);
-
-        manager.updateSubtask(updatedSubtask);
-
-        Subtask retrievedSubtask = manager.getSubtaskById(subtaskId);
-        assertNotNull(retrievedSubtask, "Подзадача должна существовать после обновления");
-        System.out.println("retrievedSubtask.getStatus()=" + retrievedSubtask.getStatus() +
-                "   subtask1.getStatus()= "  +subtask1.getStatus() +
-                "  retrievedSubtask.getId() = " + retrievedSubtask.getId() +
-                "subtask1.getId() = " + subtask1.getId() +
-                "  retrievedSubtask.getEpicId() = " + retrievedSubtask.getEpicId() +
-                "subtask1.getEpicId() = " + subtask1.getEpicId() );
-
-        assertEquals(newTitle, retrievedSubtask.getTitle(), "Название не обновилось");
-        assertEquals(newDescription, retrievedSubtask.getDescription(), "Описание не обновилось");
-        assertEquals(newStatus, retrievedSubtask.getStatus(), "Статус не обновился");
-
-        assertNotEquals(originalTitle, retrievedSubtask.getTitle());
-        assertNotEquals(originalDescription, retrievedSubtask.getDescription());
-
-        int epicRetrievedSubtaskId = retrievedSubtask.getEpicId();
-        Epic retrievEpic = manager.getEpicById(epicRetrievedSubtaskId);
-        // Проверяем обновление статуса эпика
-        assertEquals(Status.IN_PROGRESS, retrievEpic.getStatus(), "Статус эпика должен обновиться");
-    }
 }

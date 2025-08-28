@@ -112,9 +112,6 @@ class InMemoryHistoryManagerTest {
                 manager, Status.NEW));
         int taskId = task.getId();
         Task firstVersion = manager.getTaskById(taskId);
-        String originalTitle = firstVersion.getTitle();
-        String originalDescription = firstVersion.getDescription();
-        Status originalStatus = firstVersion.getStatus();
 
         String newTitle = "Купить продукты и приготовить ужин";
         String newDescription = "Хлеб, яйца, масло, овощи";

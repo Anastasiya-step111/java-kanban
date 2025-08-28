@@ -6,7 +6,7 @@ public class Task {
     private int id;
     private Status status;
 
-    protected final TaskManager taskManager;
+    protected TaskManager taskManager;
 
     public Task(String title, String description, TaskManager taskManager, Status status) {
         this.title = title;
@@ -16,34 +16,42 @@ public class Task {
     }
 
     public String getTitle() {
+
         return title;
     }
 
     public void setTitle(String title) {
+
         this.title = title;
     }
 
     public String getDescription() {
+
         return description;
     }
 
     public void setDescription(String description) {
+
         this.description = description;
     }
 
     public int getId() {
+
         return id;
     }
 
     public void setId(int id) {
+
         this.id = id;
     }
 
     public Status getStatus() {
+
         return status;
     }
 
     public void setStatus(Status status) {
+
         this.status = status;
     }
 
