@@ -1,3 +1,7 @@
+package ru.practicum.model;
+
+import ru.practicum.manager.TaskManager;
+
 import java.util.Objects;
 
 public class Subtask extends Task {
@@ -23,7 +27,7 @@ public class Subtask extends Task {
         }
 
         if (!found) {
-            throw new IllegalArgumentException("Epic с указанным ID не существует");
+            throw new IllegalArgumentException("model.Epic с указанным ID не существует");
         }
 
         this.epicId = epicId;

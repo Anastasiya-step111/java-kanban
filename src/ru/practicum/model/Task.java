@@ -1,3 +1,7 @@
+package ru.practicum.model;
+
+import ru.practicum.manager.TaskManager;
+
 import java.util.Objects;
 
 public class Task {

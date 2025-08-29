@@ -1,5 +1,12 @@
+package model;
+
+import ru.practicum.manager.HistoryManager;
+import ru.practicum.manager.Managers;
+import ru.practicum.manager.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.practicum.model.Status;
+import ru.practicum.model.Task;
 
 import java.util.List;
 
@@ -46,7 +53,7 @@ class TaskTest {
         int originalId = task1.getId();
         Task retrievedTask = manager.getTaskById(originalId);
         Status retrievedStatus = retrievedTask.getStatus();
-        assertEquals(originalStatus, retrievedStatus, "Status не совпадает при получении через менеджер");
+        assertEquals(originalStatus, retrievedStatus, "model.Status не совпадает при получении через менеджер");
     }
 
     @Test
@@ -67,7 +74,7 @@ class TaskTest {
 
     @Test
     void testEqualsById() {
-        assertEquals(task1.getId(), task3.getId(), "ID одинаковых экземпляров класса Task должны совпадать");
+        assertEquals(task1.getId(), task3.getId(), "ID одинаковых экземпляров класса model.Task должны совпадать");
         assertTrue(task1.equals(task3), "Задачи с одинаковым ID должны быть равны");
     }
 

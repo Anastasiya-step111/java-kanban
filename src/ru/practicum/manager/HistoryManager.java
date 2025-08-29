@@ -1,3 +1,7 @@
+package ru.practicum.manager;
+
+import ru.practicum.model.Task;
+
 import java.util.List;
 
 public interface HistoryManager {

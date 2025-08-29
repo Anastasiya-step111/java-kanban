@@ -1,5 +1,14 @@
+package model;
+
+import ru.practicum.manager.HistoryManager;
+import ru.practicum.manager.Managers;
+import ru.practicum.manager.TaskManager;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.practicum.model.Epic;
+import ru.practicum.model.Status;
+import ru.practicum.model.Subtask;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -69,7 +78,7 @@ class SubtaskTest {
         int idSubtask3 = subtask2.getId();
         assertThrows(IllegalArgumentException.class, () -> {
             subtask2.setEpicId(idSubtask3);
-        }, "Должна быть ошибка при добавлении Id принадлежащем объекту Subtask");
+        }, "Должна быть ошибка при добавлении Id принадлежащем объекту model.Subtask");
     }
 
     @Test

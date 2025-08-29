@@ -1,3 +1,5 @@
+package ru.practicum.manager;
+
 public final class Managers {
     private Managers() {
     }
