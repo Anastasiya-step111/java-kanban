@@ -1,7 +1,6 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,7 +40,7 @@ class EpicTest {
 
     @Test
     void testGetSubtasks() {
-        ArrayList<Subtask> allSubtasks = epic1.getSubtasks();
+        List<Subtask> allSubtasks = epic1.getSubtasks();
 
         assertEquals(2, allSubtasks.size(), "В списке должно быть 2 подзадачи для epic1");
         assertTrue(allSubtasks.contains(subtask1), "Список должен содержать первую подзадачу");
@@ -51,10 +50,10 @@ class EpicTest {
 
     @Test
     void testAddSubtask() {
-        ArrayList<Subtask> allSubtasks = epic1.getSubtasks();
+        List<Subtask> allSubtasks = epic1.getSubtasks();
         Subtask newSubtask = manager.createSubtask(
                 new Subtask("Новая подзадача", "Новое описание", manager, epic1.getId(), Status.NEW));
-        ArrayList<Subtask> updatedList = epic1.getSubtasks();
+        List<Subtask> updatedList = epic1.getSubtasks();
 
         assertEquals(3, updatedList.size(), "Размер списка должен увеличиться на 1");
         assertTrue(updatedList.contains(newSubtask), "Добавленная подзадача должна быть в списке");
@@ -71,11 +70,11 @@ class EpicTest {
 
     @Test
     void testRemoveSubtask() {
-        ArrayList<Subtask> initialList = epic1.getSubtasks();
+        List<Subtask> initialList = epic1.getSubtasks();
         assertEquals(2, initialList.size(), "Начальный размер должен быть 2");
 
         epic1.removeSubtask(subtask1);
-        ArrayList<Subtask> updatedList = epic1.getSubtasks();
+        List<Subtask> updatedList = epic1.getSubtasks();
         assertEquals(1, updatedList.size(), "Размер должен уменьшиться на 1");
         assertFalse(updatedList.contains(subtask1), "Удаленная подзадача не должна быть в списке");
 
@@ -121,7 +120,7 @@ class EpicTest {
         Epic createdEmptyTitleEpic = manager.createEpic(epicWithEmptyTitle);
         assertNotNull(createdEmptyTitleEpic, "Должен создать эпик с пустым названием");
 
-        ArrayList<Epic> finalList = manager.getAllEpics();
+        List<Epic> finalList = manager.getAllEpics();
         assertTrue(finalList.contains(epic1), "Новый эпик должен быть в системе");
         assertTrue(finalList.contains(createdEmptyDescriptionEpic), "Эпик с пустым описанием должен быть в системе");
         assertTrue(finalList.contains(createdEmptyTitleEpic), "Эпик с пустым названием должен быть в системе");

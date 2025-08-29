@@ -5,23 +5,23 @@ public interface TaskManager {
 
         int getCurrentTaskCount();
 
-        ArrayList<Task> getAllTasks();
+        List<Task> getAllTasks();
         Task getTaskById(int id);
         Task createTask(Task task);
         void updateTask(Task task);
         void deleteTask(int id);
         void deleteAllTasks();
 
-        ArrayList<Epic> getAllEpics();
+        List<Epic> getAllEpics();
         Epic getEpicById(int id);
         Epic createEpic(Epic epic);
         void updateEpic(Epic epic);
         void deleteEpic(int id);
         void deleteAllEpics();
 
-        ArrayList<Subtask> getAllSubtasks();
+        List<Subtask> getAllSubtasks();
         Subtask getSubtaskById(int id);
-        ArrayList<Subtask> getSubtasksByEpicId(int id);
+        List<Subtask> getSubtasksByEpicId(int id);
         Subtask createSubtask(Subtask subtask);
         void deleteAllSubtasks();
         void removeSubtaskById(int id);

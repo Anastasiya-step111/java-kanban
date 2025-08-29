@@ -3,7 +3,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
 
 class SubtaskTest {
@@ -74,7 +74,7 @@ class SubtaskTest {
 
     @Test
     void testGetAllSubtasks() {
-        ArrayList<Subtask> allSubtasks = manager.getAllSubtasks();
+        List<Subtask> allSubtasks = manager.getAllSubtasks();
 
         assertEquals(3, allSubtasks.size(), "Должны быть все созданные подзадачи");
 
@@ -111,12 +111,12 @@ class SubtaskTest {
 
     @Test
     void testSubtaskRemoveById() {
-        ArrayList<Subtask> initialList = manager.getAllSubtasks();
+        List<Subtask> initialList = manager.getAllSubtasks();
         assertEquals(3, initialList.size(), "В списке должно быть 3 подзадачи");
 
         manager.removeSubtaskById(subtask2.getId());
 
-        ArrayList<Subtask> updatedList = manager.getAllSubtasks();
+        List<Subtask> updatedList = manager.getAllSubtasks();
         assertEquals(2, updatedList.size(), "После удаления должна остаться 2 подзадачи");
         assertFalse(updatedList.contains(subtask2), "Удаленная подзадача не должна быть в списке");
 
@@ -146,7 +146,7 @@ class SubtaskTest {
 
         assertNotNull(emptyTitleSubtask, "Должна создать подзадачу с пустым названием");
 
-        ArrayList<Subtask> allSubtasks = manager.getAllSubtasks();
+        List<Subtask> allSubtasks = manager.getAllSubtasks();
         assertTrue(allSubtasks.contains(subtask2), "Новая подзадача должна быть в списке");
         assertTrue(allSubtasks.contains(emptyDescriptionSubtask), "Подзадача с пустым описанием " +
                 "должна быть в списке");
@@ -158,7 +158,7 @@ class SubtaskTest {
 
     @Test
     void testDeleteAllSubtasks() {
-        ArrayList<Subtask> initialSubtasks = manager.getAllSubtasks();
+        List<Subtask> initialSubtasks = manager.getAllSubtasks();
         assertEquals(3, initialSubtasks.size(), "Изначально должно быть 3 подзадачи");
 
         assertTrue(manager.getAllSubtasks().contains(subtask1));

@@ -1,7 +1,7 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -103,7 +103,7 @@ class TaskTest {
     @Test
     void testDeleteTask() {
         int taskId = task1.getId();
-        ArrayList<Task> allTasks = manager.getAllTasks();
+        List<Task> allTasks = manager.getAllTasks();
 
         boolean taskExists = false;
         for (Task task : allTasks) {
@@ -118,7 +118,7 @@ class TaskTest {
 
         manager.deleteTask(taskId);
 
-        ArrayList<Task> updatedTasks = manager.getAllTasks();
+        List<Task> updatedTasks = manager.getAllTasks();
 
         boolean taskStillExists = false;
         for (Task task : updatedTasks) {
