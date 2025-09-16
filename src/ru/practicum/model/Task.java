@@ -27,6 +27,7 @@ public class Task {
     public void setTitle(String title) {
 
         this.title = title;
+        taskManager.update(this);
     }
 
     public String getDescription() {
@@ -37,6 +38,7 @@ public class Task {
     public void setDescription(String description) {
 
         this.description = description;
+        taskManager.update(this);
     }
 
     public int getId() {
@@ -57,6 +59,7 @@ public class Task {
     public void setStatus(Status status) {
 
         this.status = status;
+        taskManager.update(this);
     }
 
     @Override

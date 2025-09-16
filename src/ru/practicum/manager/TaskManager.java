@@ -9,6 +9,7 @@ import java.util.List;
 public interface TaskManager {
 
         int getCurrentTaskCount();
+        public <T extends Task> void update(T task);
 
         List<Task> getAllTasks();
         Task getTaskById(int id);
