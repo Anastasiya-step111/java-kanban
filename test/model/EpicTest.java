@@ -213,4 +213,52 @@ class EpicTest {
         assertEquals(2, epic1.getSubtasks().size(), "подзадач должно быть 2");
         assertEquals(Status.DONE, epic1.getStatus(), "Статус эпика должен обновиться");
     }
+
+    @Test
+    void testEpicSetTitle() {
+        assertEquals("Учить английский", epic1.getTitle());
+
+        int epicId = epic1.getId();
+
+        epic1.setTitle("Изучать английский язык");
+
+        assertEquals("Изучать английский язык", epic1.getTitle());
+
+        Epic updatedEpic = manager.getEpicById(epicId);
+        assertNotNull(updatedEpic);
+        assertEquals("Изучать английский язык", updatedEpic.getTitle());
+    }
+
+    @Test
+    void testEpicSetDescription() {
+
+        assertEquals("Очень страшная задача", epic1.getDescription());
+
+        int epicId = epic1.getId();
+
+        epic1.setDescription("Очень важная и страшная задача");
+
+        assertEquals("Очень важная и страшная задача", epic1.getDescription());
+
+        Epic updatedEpic = manager.getEpicById(epicId);
+        assertNotNull(updatedEpic);
+        assertEquals("Очень важная и страшная задача", updatedEpic.getDescription());
+    }
+
+    @Test
+    void testEpicSetStatus() {
+        assertEquals(Status.NEW, epic1.getStatus());
+
+        subtask1.setStatus(Status.DONE);
+        subtask2.setStatus(Status.DONE);
+        manager.updateSubtask(subtask1, subtask1.getId());
+        manager.updateSubtask(subtask2, subtask2.getId());
+
+        assertEquals(Status.DONE, epic1.getStatus());
+
+        subtask1.setStatus(Status.NEW);
+        manager.updateSubtask(subtask1, subtask1.getId());
+
+        assertEquals(Status.IN_PROGRESS, epic1.getStatus());
+    }
 }

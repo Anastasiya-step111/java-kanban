@@ -164,5 +164,44 @@ class TaskTest {
         assertEquals(1, manager.getAllTasks().size(), "Должна быть только одна задача");
         assertNotNull(manager.getTaskById(newTask.getId()), "Созданная задача должна быть доступна");
     }
+
+    @Test
+    void testSetTitle() {
+        assertEquals("Купить продукты", task1.getTitle());
+
+        int taskId = task1.getId();
+
+        task1.setTitle("Купить лекарства");
+        assertEquals("Купить лекарства", task1.getTitle());
+
+        Task updatedTask = manager.getTaskById(taskId);
+        assertNotNull(updatedTask);
+        assertEquals("Купить лекарства", updatedTask.getTitle());
+    }
+
+    @Test
+    void testSetDescription() {
+        assertEquals("Хлеб яйца масло", task1.getDescription());
+        int taskId = task1.getId();
+        task1.setDescription("Молоко, сыр, хлеб");
+
+        assertEquals("Молоко, сыр, хлеб", task1.getDescription());
+
+        Task updatedTask = manager.getTaskById(taskId);
+        assertEquals("Молоко, сыр, хлеб", updatedTask.getDescription());
+    }
+
+    @Test
+    void testSetStatus() {
+        assertEquals(Status.NEW, task1.getStatus());
+        int taskId = task1.getId();
+        task1.setStatus(Status.DONE);
+
+        assertEquals(Status.DONE, task1.getStatus());
+
+        Task updatedTask = manager.getTaskById(taskId);
+        assertEquals(Status.DONE, updatedTask.getStatus());
+    }
+
 }
 

@@ -226,4 +226,39 @@ class SubtaskTest {
         assertEquals(Status.IN_PROGRESS, retrievedEpic.getStatus(), "Статус эпика должен обновиться");
     }
 
+    @Test
+    void testSubtaskSetTitle() {
+        assertEquals("Найти репетитора", subtask1.getTitle());
+
+        subtask1.setTitle("Искать преподавателя");
+
+        assertEquals("Искать преподавателя", subtask1.getTitle());
+
+        Subtask updatedSubtask = manager.getSubtaskById(subtask1.getId());
+        assertEquals("Искать преподавателя", updatedSubtask.getTitle());
+    }
+
+    @Test
+    void testSubtaskSetDescription() {
+        assertEquals("Почитать отзывы", subtask1.getDescription());
+
+        subtask1.setDescription("Найти отзывы на сайтах");
+
+        assertEquals("Найти отзывы на сайтах", subtask1.getDescription());
+
+        Subtask updatedSubtask = manager.getSubtaskById(subtask1.getId());
+        assertEquals("Найти отзывы на сайтах", updatedSubtask.getDescription());
+    }
+
+    @Test
+    void testSubtaskSetStatus() {
+        assertEquals(Status.NEW, subtask1.getStatus());
+
+        subtask1.setStatus(Status.IN_PROGRESS);
+        assertEquals(Status.IN_PROGRESS, subtask1.getStatus());
+
+        Subtask updatedSubtask = manager.getSubtaskById(subtask1.getId());
+        assertEquals(Status.IN_PROGRESS, updatedSubtask.getStatus());
+    }
 }
+
