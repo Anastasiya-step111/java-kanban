@@ -96,7 +96,6 @@ public class InMemoryTaskManager implements TaskManager {
     public Epic getEpicById(int id) {
         Epic epic = epics.get(id);
         if (epic != null) {
-            System.out.println("Получен эпик с ID: " + id + ", статус: " + epic.getStatus());
             historyManager.add(epic);
         }
         return epic;
