@@ -117,7 +117,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic createEpic(Epic epic) {
         for (Epic existingEpic : epics.values()) {
-            if ( Objects.equals(existingEpic.getDescription(), epic.getDescription()) &&
+            if (Objects.equals(existingEpic.getDescription(), epic.getDescription()) &&
                     Objects.equals(existingEpic.getTitle(), epic.getTitle())) {
 
                 return existingEpic;
