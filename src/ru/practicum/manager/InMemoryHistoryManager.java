@@ -26,22 +26,18 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void add(Task task) {
         Integer taskId = task.getId();
 
-        // Если задача уже есть в истории - удаляем её
         if (history.containsKey(taskId)) {
             removeNode(history.get(taskId));
         }
 
-        // Создаем новый узел и добавляем в конец списка
         Node newNode = new Node(task);
         linkLast(newNode);
         history.put(taskId, newNode);
     }
 
-    // Метод удаления узла
     private void removeNode(Node node) {
         if (node == null) return;
 
-        // Обновляем ссылки соседних узлов
         Node prev = node.prev;
         Node next = node.next;
 
@@ -52,7 +48,6 @@ public class InMemoryHistoryManager implements HistoryManager {
             next.prev = prev;
         }
 
-        // Если удаляемый узел был head или tail
         if (node == head) {
             head = next;
         }
@@ -60,13 +55,11 @@ public class InMemoryHistoryManager implements HistoryManager {
             tail = prev;
         }
 
-        // Очищаем ссылки для сборки мусора
         node.prev = null;
         node.next = null;
         history.remove(node.task.getId());
     }
 
-    // Добавление узла в конец списка
     private void linkLast(Node node) {
         node.prev = tail;
         node.next = null;
@@ -81,10 +74,8 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(int id) {
-        // Получаем узел по id
         Node node = history.get(id);
         if (node != null) {
-            // Удаляем узел из списка и карты
             removeNode(node);
         }
     }
