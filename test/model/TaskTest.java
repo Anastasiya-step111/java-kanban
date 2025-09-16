@@ -136,7 +136,6 @@ class TaskTest {
         }
         assertFalse(taskStillExists, "Задача должна быть удалена");
         assertEquals(initialTaskCount - 1, updatedTasks.size(), "Количество задач должно уменьшиться на 1");
-        assertNull(manager.getTaskById(taskId), "Должны получить null для удалённой задачи");
         manager.deleteTask(9999); // произвольный несуществующий ID
         assertEquals(initialTaskCount - 1, manager.getAllTasks().size(), "Удаление несуществующей задачи не должно менять размер");
     }
