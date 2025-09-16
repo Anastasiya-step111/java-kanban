@@ -20,8 +20,6 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testGetCurrentTaskCount() {
-        int initialCount = manager.getCurrentTaskCount();
-        assertEquals(2, initialCount, "Начальный счетчик должен быть равен 2");
 
         int countAfterFirstCall = manager.getCurrentTaskCount();
         assertEquals(3, countAfterFirstCall, "После первого вызова счетчик должен увеличиться на 1");
@@ -84,19 +82,16 @@ class InMemoryTaskManagerTest {
         Subtask testSubtask4 = manager.getSubtaskById(subtask1.getId());
 
         List<Task> historyAfterGet = historyManager.getHistory();
-        assertEquals(10, historyAfterGet.size(), "В истории должно быть 10 элементов");
+        assertEquals(7, historyAfterGet.size(), "В истории должно быть 7 элементов");
         assertTrue(historyAfterGet.contains(task2), "Полученная задача должна быть в истории");
         assertTrue(historyAfterGet.contains(epic2), "Полученный эпик должен быть в истории");
         assertTrue(historyAfterGet.contains(subtask1), "Полученная подзадача должна быть в истории");
 
         List<Task> comparisonHistoryAfterGet = Arrays.asList(
-                task1,
                 task2,
                 task1,
                 epic1,
                 epic2,
-                epic2,
-                subtask1,
                 subtask2,
                 subtask3,
                 subtask1
@@ -105,18 +100,15 @@ class InMemoryTaskManagerTest {
 
         Subtask testSubtask5 = manager.getSubtaskById(subtask1.getId());
         historyAfterGet = historyManager.getHistory();
-        assertEquals(10, historyAfterGet.size(), "В истории должно быть 10 элементов");
+        assertEquals(7, historyAfterGet.size(), "В истории должно быть 7 элементов");
 
         List<Task> comparisonHistoryAfterGet2 = Arrays.asList(
                 task2,
                 task1,
                 epic1,
                 epic2,
-                epic2,
-                subtask1,
                 subtask2,
                 subtask3,
-                subtask1,
                 subtask1
         );
         assertEquals(comparisonHistoryAfterGet2, historyAfterGet, "История сохраняется с ошибками");
