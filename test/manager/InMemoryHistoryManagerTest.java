@@ -19,7 +19,7 @@ class InMemoryHistoryManagerTest {
     TaskManager manager = Managers.getDefault();
     HistoryManager historyManager = manager.getHistoryManager();
 
-    Task initialTask;
+    Task task1;
     Task task2;
 
     Epic epic1;
@@ -33,7 +33,7 @@ class InMemoryHistoryManagerTest {
 
     @BeforeEach
     public void beforeEach() {
-        initialTask = manager.createTask(new Task("Купить продукты", "Хлеб яйца масло", manager, Status.NEW));
+        task1 = manager.createTask(new Task("Купить продукты", "Хлеб яйца масло", manager, Status.NEW));
         task2 = manager.createTask(new Task("Постирать вещи", "Разделить по цветам", manager, Status.NEW));
 
         epic1 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача", manager,
@@ -53,12 +53,12 @@ class InMemoryHistoryManagerTest {
     void testAddTaskAndGetHistory() {
 
 
-        Task testTask1 = manager.getTaskById(initialTask.getId());
+        Task testTask1 = manager.getTaskById(task1.getId());
         Task testTask2 = manager.getTaskById(task2.getId());
-        Task testTask3 = manager.getTaskById(initialTask.getId());
+        Task testTask3 = manager.getTaskById(task1.getId());
 
         List<Task> historyAfterGet = historyManager.getHistory();
-        assertEquals(3, historyAfterGet.size(), "В истории должно быть 3 элемента");
+        assertEquals(2, historyAfterGet.size(), "В истории должно быть 2 элемента");
         assertTrue(historyAfterGet.contains(task2), "Полученная задача должна быть в истории");
 
         Epic testEpic1 = manager.getEpicById(epic1.getId());
@@ -66,7 +66,7 @@ class InMemoryHistoryManagerTest {
         Epic testEpic3 = manager.getEpicById(epic2.getId());
 
         historyAfterGet = historyManager.getHistory();
-        assertEquals(6, historyAfterGet.size(), "В истории должно быть 6 элементов");
+        assertEquals(4, historyAfterGet.size(), "В истории должно быть 4 элемента");
         assertTrue(historyAfterGet.contains(epic2), "Полученный эпик должен быть в истории");
         assertTrue(historyAfterGet.contains(epic1), "Полученный эпик должен быть в истории");
 
@@ -76,19 +76,16 @@ class InMemoryHistoryManagerTest {
         Subtask testSubtask4 = manager.getSubtaskById(subtask1.getId());
 
         historyAfterGet = historyManager.getHistory();
-        assertEquals(10, historyAfterGet.size(), "В истории должно быть 10 элементов");
+        assertEquals(7, historyAfterGet.size(), "В истории должно быть 7 элементов");
         assertTrue(historyAfterGet.contains(subtask1), "Полученная подзадача должна быть в истории");
         assertTrue(historyAfterGet.contains(subtask2), "Полученная подзадача должна быть в истории");
         assertTrue(historyAfterGet.contains(subtask3), "Полученная подзадача должна быть в истории");
 
         List<Task> comparisonHistoryAfterGet = Arrays.asList(
-                initialTask,
                 task2,
-                initialTask,
+                task1,
                 epic1,
                 epic2,
-                epic2,
-                subtask1,
                 subtask2,
                 subtask3,
                 subtask1
@@ -97,62 +94,74 @@ class InMemoryHistoryManagerTest {
 
         Subtask testSubtask5 = manager.getSubtaskById(subtask1.getId());
         historyAfterGet = historyManager.getHistory();
-        assertEquals(10, historyAfterGet.size(), "В истории должно быть 10 элементов");
+        assertEquals(7, historyAfterGet.size(), "В истории должно быть 7 элементов");
 
-        List<Task> comparisonHistoryAfterGet2 = Arrays.asList(
-                task2,
-                initialTask,
-                epic1,
-                epic2,
-                epic2,
-                subtask1,
-                subtask2,
-                subtask3,
-                subtask1,
-                subtask1
-        );
-        assertEquals(comparisonHistoryAfterGet2, historyAfterGet, "История сохраняется с ошибками");
     }
 
     @Test
-    void testHistoryManagerVersioning() {
+    void testRemoveTask() {
+        // Добавляем задачу
+        historyManager.add(task1);
 
-        Task task = manager.createTask(new Task("Купить продукты", "Хлеб яйца масло",
-                manager, Status.NEW));
-        int taskId = task.getId();
-        Task firstVersion = manager.getTaskById(taskId);
+        // Проверяем наличие
+        assertTrue(historyManager.getHistory().contains(task1));
 
-        String newTitle = "Купить продукты и приготовить ужин";
-        String newDescription = "Хлеб, яйца, масло, овощи";
-        Status newStatus = Status.IN_PROGRESS;
+        // Удаляем задачу
+        historyManager.remove(task1.getId());
 
-        Task updatedTask = new Task(newTitle, newDescription, manager, newStatus);
-        updatedTask.setId(taskId);
+        // Проверяем удаление
+        assertFalse(historyManager.getHistory().contains(task1));
+        assertEquals(0, historyManager.getHistory().size());
+    }
 
-        manager.updateTask(updatedTask);
+    @Test
+    void testAddAndRemoveEpic() {
+        // Добавляем эпик
+        historyManager.add(epic1);
 
-        Task updatedFromManager = manager.getTaskById(taskId);
+        // Проверяем добавление
+        assertTrue(historyManager.getHistory().contains(epic1));
 
+        // Удаляем эпик
+        historyManager.remove(epic1.getId());
 
-        List<Task> history = historyManager.getHistory();
-        assertEquals(2, history.size(), "В истории должно быть 2 версии задачи");
+        // Проверяем удаление
+        assertFalse(historyManager.getHistory().contains(epic1));
+    }
 
-        Task firstHistoryEntry = history.get(0);
-        assertEquals(firstVersion.getTitle(), firstVersion.getTitle(), "Заголовок первой версии не совпадает");
-        assertEquals(firstVersion.getDescription(), firstVersion.getDescription(), "Описание первой версии не совпадает");
-        assertEquals(firstVersion.getStatus(), Status.NEW, "Статус первой версии не совпадает");
+    @Test
+    void testAddAndRemoveSubtask() {
+        // Добавляем подзадачу
+        historyManager.add(subtask1);
 
-        Task secondHistoryEntry = history.get(1);
-        assertEquals(updatedFromManager.getTitle(), "Купить продукты и приготовить ужин", "Заголовок второй версии не совпадает");
-        assertEquals(updatedFromManager.getDescription(), "Хлеб, яйца, масло, овощи", "Описание второй версии не совпадает");
-        assertEquals(updatedFromManager.getStatus(), Status.IN_PROGRESS, "Статус второй версии не совпадает");
+        // Проверяем добавление
+        assertTrue(historyManager.getHistory().contains(subtask1));
 
-        assertNotEquals(firstHistoryEntry, secondHistoryEntry, "Версии должны быть разными объектами");
-        assertNotEquals(firstHistoryEntry.getDescription(), secondHistoryEntry.getDescription(), "Описания версий должны отличаться");
-        assertNotEquals(firstHistoryEntry.getStatus(), secondHistoryEntry.getStatus(), "Статусы версий должны отличаться");
+        // Удаляем подзадачу
+        historyManager.remove(subtask1.getId());
 
-        Task currentTask = manager.getTaskById(firstVersion.getId());
-        assertEquals(currentTask.getTitle(), "Купить продукты и приготовить ужин", "В менеджере задач должна быть актуальная версия");
+        // Проверяем удаление
+        assertFalse(historyManager.getHistory().contains(subtask1));
+    }
+
+    @Test
+    void testAddExistingTask() {
+        // Добавляем задачу
+        historyManager.add(task1);
+
+        // Добавляем ту же задачу снова
+        historyManager.add(task1);
+
+        // Проверяем, что в истории только один элемент
+        assertEquals(1, historyManager.getHistory().size());
+        assertEquals(task1, historyManager.getHistory().get(0));
+    }
+
+    @Test
+    void testEmptyHistory() {
+        // Проверяем пустую историю
+        assertTrue(historyManager.getHistory().isEmpty());
+        assertEquals(0, historyManager.getHistory().size());
     }
 
 }
