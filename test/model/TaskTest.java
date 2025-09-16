@@ -24,19 +24,22 @@ class TaskTest {
     public void beforeEach() {
 
         task1 = manager.createTask(new Task("Купить продукты", "Хлеб яйца масло", manager, Status.NEW));
-        task2 = manager.createTask(new Task("Постирать вещи", "Разделить по цветам", manager, Status.NEW));
+        task2 = manager.createTask(new Task("Постирать вещи", "Разделить по цветам", manager,
+                Status.NEW));
         task3 = manager.createTask(new Task("Купить продукты", "Хлеб яйца масло", manager, Status.NEW));
 
     }
 
     @Test
     void shouldReturnCorrectTitle() {
-        assertEquals("Купить продукты", task1.getTitle(), "Название задачи искажается при методе getTitle");
+        assertEquals("Купить продукты", task1.getTitle(), "Название задачи искажается при методе " +
+                "getTitle");
     }
 
     @Test
     void shouldReturnCorrectDescription() {
-        assertEquals("Хлеб яйца масло", task1.getDescription(), "Описание искажается при методе getDescription");
+        assertEquals("Хлеб яйца масло", task1.getDescription(), "Описание искажается при методе " +
+                "getDescription");
     }
 
     @Test
@@ -68,13 +71,15 @@ class TaskTest {
     @Test
     void shouldCorrectHashCode() {
         if (task1.equals(task3)) {
-            assertEquals(task1.hashCode(), task3.hashCode(), "Нарушение контракта: равные объекты имеют разные хеш-коды");
+            assertEquals(task1.hashCode(), task3.hashCode(), "Нарушение контракта: равные объекты имеют " +
+                    "разные хеш-коды");
         }
     }
 
     @Test
     void testEqualsById() {
-        assertEquals(task1.getId(), task3.getId(), "ID одинаковых экземпляров класса model.Task должны совпадать");
+        assertEquals(task1.getId(), task3.getId(), "ID одинаковых экземпляров класса model.Task " +
+                "должны совпадать");
         assertTrue(task1.equals(task3), "Задачи с одинаковым ID должны быть равны");
     }
 
@@ -103,7 +108,8 @@ class TaskTest {
         assertEquals(newStatus, updatedFromManager.getStatus(), "Статус должен быть обновлен");
 
         assertNotEquals(originalTitle, updatedFromManager.getTitle(), "Исходное название должно отличаться");
-        assertNotEquals(originalDescription, updatedFromManager.getDescription(), "Исходное описание должно отличаться");
+        assertNotEquals(originalDescription, updatedFromManager.getDescription(), "Исходное описание " +
+                "должно отличаться");
         assertNotEquals(originalStatus, updatedFromManager.getStatus(), "Исходный статус должен отличаться");
     }
 
@@ -135,9 +141,11 @@ class TaskTest {
             }
         }
         assertFalse(taskStillExists, "Задача должна быть удалена");
-        assertEquals(initialTaskCount - 1, updatedTasks.size(), "Количество задач должно уменьшиться на 1");
+        assertEquals(initialTaskCount - 1, updatedTasks.size(), "Количество задач должно уменьшиться " +
+                "на 1");
         manager.deleteTask(9999); // произвольный несуществующий ID
-        assertEquals(initialTaskCount - 1, manager.getAllTasks().size(), "Удаление несуществующей задачи не должно менять размер");
+        assertEquals(initialTaskCount - 1, manager.getAllTasks().size(), "Удаление несуществующей " +
+                "задачи не должно менять размер");
     }
 
     @Test
@@ -149,7 +157,8 @@ class TaskTest {
         manager.createTask(new Task("Новая задача 2", "Описание 2", manager, Status.IN_PROGRESS));
 
         int updatedTaskCount = manager.getAllTasks().size();
-        assertTrue(updatedTaskCount > initialTaskCount, "Количество задач должно увеличиться после создания новых");
+        assertTrue(updatedTaskCount > initialTaskCount, "Количество задач должно увеличиться после " +
+                "создания новых");
 
         manager.deleteAllTasks();
 
@@ -159,8 +168,10 @@ class TaskTest {
         manager.deleteAllTasks();
         assertTrue(manager.getAllTasks().isEmpty(), "Повторное удаление не должно нарушить состояние");
 
-        Task newTask = manager.createTask(new Task("Проверка после очистки", "Тест", manager, Status.NEW));
-        assertFalse(manager.getAllTasks().isEmpty(), "После создания новой задачи список не должен быть пустым");
+        Task newTask = manager.createTask(new Task("Проверка после очистки", "Тест", manager,
+                Status.NEW));
+        assertFalse(manager.getAllTasks().isEmpty(), "После создания новой задачи список не должен быть " +
+                "пустым");
         assertEquals(1, manager.getAllTasks().size(), "Должна быть только одна задача");
         assertNotNull(manager.getTaskById(newTask.getId()), "Созданная задача должна быть доступна");
     }
@@ -203,5 +214,30 @@ class TaskTest {
         assertEquals(Status.DONE, updatedTask.getStatus());
     }
 
+    @Test
+    public void testCreateTask() {
+        assertNotNull(task1);
+        assertTrue(manager.getAllTasks().contains(task1));
+        assertTrue(task1.getId() > 0);
+
+        assertNotNull(task2);
+        assertTrue(manager.getAllTasks().contains(task2));
+        assertTrue(task2.getId() > 0);
+        assertNotEquals(task1.getId(), task2.getId());
+
+        assertSame(task1, task3);
+        assertEquals(2, manager.getAllTasks().size());
+
+        Task newTask = manager.createTask(new Task("Купить продукты", "Молоко сыр творог",
+                manager, Status.NEW));
+        assertNotSame(task1, newTask);
+        assertEquals(3, manager.getAllTasks().size());
+
+        Task anotherTask = manager.createTask(new Task("Купить лекарства", "Хлеб яйца масло",
+                manager, Status.NEW));
+        assertNotSame(task1, anotherTask);
+        assertEquals(4, manager.getAllTasks().size());
+    }
 }
+
 

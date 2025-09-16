@@ -31,16 +31,16 @@ class EpicTest {
     public void beforeEach() {
         epic1 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача", manager,
                 Status.NEW));
-        epicDuplicate1 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача", manager,
-                Status.NEW));
+        epicDuplicate1 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача",
+                manager, Status.NEW));
         epic2 = manager.createEpic(new Epic("Разобраться с ошибкой по коробке", "Не горит", manager,
                 Status.NEW));
 
 
         subtask1 = manager.createSubtask(new Subtask("Найти репетитора", "Почитать отзывы", manager,
                 epic1.getId(), Status.NEW));
-        subtaskDuplicate1 = manager.createSubtask(new Subtask("Найти репетитора", "Почитать отзывы", manager,
-                epicDuplicate1.getId(), Status.NEW));
+        subtaskDuplicate1 = manager.createSubtask(new Subtask("Найти репетитора", "Почитать отзывы",
+                manager, epicDuplicate1.getId(), Status.NEW));
         subtask2 = manager.createSubtask(new Subtask("Разбираться в IDEA",
                 "Переводить все встреченные слова", manager, epic1.getId(), Status.NEW));
         subtask3 = manager.createSubtask(new Subtask("Изучить вопрос на драйв2",
@@ -88,7 +88,8 @@ class EpicTest {
         assertFalse(updatedList.contains(subtask1), "Удаленная подзадача не должна быть в списке");
 
         epic1.removeSubtask(subtask3);
-        assertEquals(1, updatedList.size(), "Удаление несуществующей подзадачи не должно менять размер");
+        assertEquals(1, updatedList.size(), "Удаление несуществующей подзадачи не должно менять " +
+                "размер");
 
         epic1.removeSubtask(subtask2);
         assertTrue(epic1.getSubtasks().isEmpty(), "После удаления всех подзадач список должен быть пустым");
@@ -131,7 +132,8 @@ class EpicTest {
 
         List<Epic> finalList = manager.getAllEpics();
         assertTrue(finalList.contains(epic1), "Новый эпик должен быть в системе");
-        assertTrue(finalList.contains(createdEmptyDescriptionEpic), "Эпик с пустым описанием должен быть в системе");
+        assertTrue(finalList.contains(createdEmptyDescriptionEpic), "Эпик с пустым описанием должен " +
+                "быть в системе");
         assertTrue(finalList.contains(createdEmptyTitleEpic), "Эпик с пустым названием должен быть в системе");
     }
 
@@ -261,4 +263,34 @@ class EpicTest {
 
         assertEquals(Status.IN_PROGRESS, epic1.getStatus());
     }
+
+    @Test
+    public void testDeleteEpic() {
+        int epicId = epic1.getId();
+        manager.deleteEpic(epicId);
+
+        assertNull(manager.getEpicById(epicId));
+
+        assertFalse(manager.getAllSubtasks().contains(subtask1.getId()));
+        assertFalse(manager.getAllSubtasks().contains(subtask2.getId()));
+
+        assertNotNull(manager.getEpicById(epic2.getId()));
+        assertNotNull(manager.getSubtaskById(subtask3.getId()));
+    }
+
+    @Test
+    public void testDeleteAllEpics() {
+        manager.deleteAllEpics();
+        assertTrue(manager.getAllEpics().isEmpty());
+        assertTrue(manager.getAllSubtasks().isEmpty());
+    }
+
+    @Test
+    public void testDeleteEpicDoesNotAffectOtherEpics() {
+        manager.deleteEpic(epic1.getId());
+
+        assertNotNull(manager.getEpicById(epic2.getId()));
+        assertNotNull(manager.getSubtaskById(subtask3.getId()));
+    }
 }
+

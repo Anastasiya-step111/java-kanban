@@ -34,7 +34,8 @@ class InMemoryHistoryManagerTest {
     @BeforeEach
     public void beforeEach() {
         task1 = manager.createTask(new Task("Купить продукты", "Хлеб яйца масло", manager, Status.NEW));
-        task2 = manager.createTask(new Task("Постирать вещи", "Разделить по цветам", manager, Status.NEW));
+        task2 = manager.createTask(new Task("Постирать вещи", "Разделить по цветам", manager,
+                Status.NEW));
 
         epic1 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача", manager,
                 Status.NEW));

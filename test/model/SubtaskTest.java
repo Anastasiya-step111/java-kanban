@@ -44,10 +44,10 @@ class SubtaskTest {
     void testEpicEquals() {
         assertTrue(subtask1.equals(subtask1), "Объект должен быть равен самому себе");
 
-        Epic epicDuplicate1 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача", manager,
-                Status.NEW));
-        Subtask subtaskDuplicate1 = manager.createSubtask(new Subtask("Найти репетитора", "Почитать отзывы", manager,
-                epicDuplicate1.getId(), Status.NEW));
+        Epic epicDuplicate1 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача",
+                manager, Status.NEW));
+        Subtask subtaskDuplicate1 = manager.createSubtask(new Subtask("Найти репетитора",
+                "Почитать отзывы", manager, epicDuplicate1.getId(), Status.NEW));
 
         assertTrue(subtask1.equals(subtaskDuplicate1), "Идентичные подзадачи должны быть равны");
         assertEquals(subtask1.getId(), subtaskDuplicate1.getId(), "IDs идентичных подзадач должны совпадать");
@@ -138,7 +138,8 @@ class SubtaskTest {
         assertNotNull(subtask1, "Подзадача должна быть создана");
         assertNotEquals(0, subtask1.getId(), "ID подзадачи не должен быть нулевым");
 
-        Subtask subtaskDuplicate1 = manager.createSubtask(new Subtask("Найти репетитора", "Почитать отзывы", manager,
+        Subtask subtaskDuplicate1 = manager.createSubtask(new Subtask("Найти репетитора",
+                "Почитать отзывы", manager,
                 epic1.getId(), Status.NEW));
         assertEquals(subtask1, subtaskDuplicate1, "При добавлении идентичной подзадачи должна вернуться " +
                 "существующая подзадача");
@@ -159,7 +160,8 @@ class SubtaskTest {
         assertTrue(allSubtasks.contains(subtask2), "Новая подзадача должна быть в списке");
         assertTrue(allSubtasks.contains(emptyDescriptionSubtask), "Подзадача с пустым описанием " +
                 "должна быть в списке");
-        assertTrue(allSubtasks.contains(emptyTitleSubtask), "Подзадача с пустым названием должна быть в списке");
+        assertTrue(allSubtasks.contains(emptyTitleSubtask), "Подзадача с пустым названием должна быть " +
+                "в списке");
 
         Epic epic = manager.getEpicById(epic1.getId());
         assertTrue(epic.getSubtasks().contains(subtask2), "Подзадача должна быть добавлена в эпик");
@@ -261,4 +263,3 @@ class SubtaskTest {
         assertEquals(Status.IN_PROGRESS, updatedSubtask.getStatus());
     }
 }
-

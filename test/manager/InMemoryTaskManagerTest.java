@@ -25,7 +25,8 @@ class InMemoryTaskManagerTest {
         assertEquals(3, countAfterFirstCall, "После первого вызова счетчик должен увеличиться на 1");
 
         int countAfterSecondCall = manager.getCurrentTaskCount();
-        assertEquals(4, countAfterSecondCall, "После второго вызова счетчик должен увеличиться еще на 1");
+        assertEquals(4, countAfterSecondCall, "После второго вызова счетчик должен увеличиться еще " +
+                "на 1");
 
         int countAfterThirdCall = manager.getCurrentTaskCount();
         assertEquals(5, countAfterThirdCall, "Каждый вызов должен увеличивать счетчик на 1");
@@ -56,15 +57,17 @@ class InMemoryTaskManagerTest {
     void testGetHistory() {
         HistoryManager historyManager = manager.getHistoryManager();
 
-        Task task1 = manager.createTask(new Task("Купить продукты", "Хлеб яйца масло", manager, Status.NEW));
-        Task task2 = manager.createTask(new Task("Постирать вещи", "Разделить по цветам", manager, Status.NEW));
+        Task task1 = manager.createTask(new Task("Купить продукты", "Хлеб яйца масло", manager,
+                Status.NEW));
+        Task task2 = manager.createTask(new Task("Постирать вещи", "Разделить по цветам", manager,
+                Status.NEW));
 
         Epic epic1 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача", manager,
                 Status.NEW));
         Epic epic2 = manager.createEpic(new Epic("Разобраться с ошибкой по коробке", "Не горит", manager,
                 Status.NEW));
-        Subtask subtask1 = manager.createSubtask(new Subtask("Найти репетитора", "Почитать отзывы", manager,
-                epic1.getId(), Status.NEW));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Найти репетитора", "Почитать отзывы",
+                manager, epic1.getId(), Status.NEW));
         Subtask subtask2 = manager.createSubtask(new Subtask("Разбираться в IDEA",
                 "Переводить все встреченные слова", manager, epic1.getId(), Status.NEW));
         Subtask subtask3 = manager.createSubtask(new Subtask("Изучить вопрос на драйв2",
@@ -113,5 +116,6 @@ class InMemoryTaskManagerTest {
         );
         assertEquals(comparisonHistoryAfterGet2, historyAfterGet, "История сохраняется с ошибками");
     }
+
 }
 
