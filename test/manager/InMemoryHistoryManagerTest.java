@@ -100,66 +100,43 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void testRemoveTask() {
-        // Добавляем задачу
         historyManager.add(task1);
-
-        // Проверяем наличие
         assertTrue(historyManager.getHistory().contains(task1));
 
-        // Удаляем задачу
         historyManager.remove(task1.getId());
-
-        // Проверяем удаление
         assertFalse(historyManager.getHistory().contains(task1));
         assertEquals(0, historyManager.getHistory().size());
     }
 
     @Test
     void testAddAndRemoveEpic() {
-        // Добавляем эпик
         historyManager.add(epic1);
-
-        // Проверяем добавление
         assertTrue(historyManager.getHistory().contains(epic1));
 
-        // Удаляем эпик
         historyManager.remove(epic1.getId());
-
-        // Проверяем удаление
         assertFalse(historyManager.getHistory().contains(epic1));
     }
 
     @Test
     void testAddAndRemoveSubtask() {
-        // Добавляем подзадачу
         historyManager.add(subtask1);
-
-        // Проверяем добавление
         assertTrue(historyManager.getHistory().contains(subtask1));
 
-        // Удаляем подзадачу
         historyManager.remove(subtask1.getId());
-
-        // Проверяем удаление
         assertFalse(historyManager.getHistory().contains(subtask1));
     }
 
     @Test
     void testAddExistingTask() {
-        // Добавляем задачу
+        historyManager.add(task1);
         historyManager.add(task1);
 
-        // Добавляем ту же задачу снова
-        historyManager.add(task1);
-
-        // Проверяем, что в истории только один элемент
         assertEquals(1, historyManager.getHistory().size());
         assertEquals(task1, historyManager.getHistory().get(0));
     }
 
     @Test
     void testEmptyHistory() {
-        // Проверяем пустую историю
         assertTrue(historyManager.getHistory().isEmpty());
         assertEquals(0, historyManager.getHistory().size());
     }
