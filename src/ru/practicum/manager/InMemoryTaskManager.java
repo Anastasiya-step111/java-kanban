@@ -39,6 +39,19 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
+    public <T extends Task> void update(T task) {
+        if (task instanceof Task) {
+            updateTask(task);
+        } else if (task instanceof Epic) {
+            updateEpic((Epic) task);
+        } else if (task instanceof Subtask) {
+            updateSubtask((Subtask) task, task.getId());
+        } else {
+            throw new IllegalArgumentException("Неизвестный тип задачи");
+        }
+    }
+
+    @Override
     public List<Task> getAllTasks() {
 
         return new ArrayList<>(tasks.values());
@@ -96,7 +109,6 @@ public class InMemoryTaskManager implements TaskManager {
     public Epic getEpicById(int id) {
         Epic epic = epics.get(id);
         if (epic != null) {
-            System.out.println("Получен эпик с ID: " + id + ", статус: " + epic.getStatus());
             historyManager.add(epic);
         }
         return epic;
@@ -105,7 +117,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic createEpic(Epic epic) {
         for (Epic existingEpic : epics.values()) {
-            if ( Objects.equals(existingEpic.getDescription(), epic.getDescription()) &&
+            if (Objects.equals(existingEpic.getDescription(), epic.getDescription()) &&
                     Objects.equals(existingEpic.getTitle(), epic.getTitle())) {
 
                 return existingEpic;
@@ -269,7 +281,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateSubtask(Subtask updatedSubtask, int id) {
+    public void updateSubtask(Subtask updatedSubtask, int updateSubtaskId) {
         int epicId = updatedSubtask.getEpicId();
         Epic epic = epics.get(epicId);
 
@@ -277,12 +289,12 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalArgumentException("Эпик с ID " + epicId + " не найден");
         }
 
-        epic.getSubtasks().removeIf(subtask -> subtask.getId() == id);
+        epic.getSubtasks().removeIf(subtask -> subtask.getId() == updateSubtaskId);
 
 
 
-        updatedSubtask.setId(id);
-        subtasks.put(id, updatedSubtask);
+        updatedSubtask.setId(updateSubtaskId);
+        subtasks.put(updateSubtaskId, updatedSubtask);
         epic.addSubtask(updatedSubtask);
         updateEpic(epic);
     }
