@@ -58,4 +58,14 @@ public class Subtask extends Task {
         return Objects.hash(super.hashCode(), epicId);
     }
 
+    @Override
+    public TaskType getType() {
+        return TaskType.SUBTASK;
+    }
+
+    @Override
+    public String toCSVStr() {
+        return String.format("%d,%s,%s,%s,%s,%d", getId(), getType(), getTitle(), getStatus(), getDescription(),
+                getEpicId());
+    }
 }
