@@ -176,7 +176,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     break;
                 }
 
+                System.out.println("Текущая строка: " + line);
                 String[] parts = line.split(",");
+                if (parts.length < 5) {
+                    System.err.println("Строка не соответствует формату: " + line);
+                    continue;
+                }
 
                 switch (TaskType.valueOf(parts[1])) {
                     case TASK:
