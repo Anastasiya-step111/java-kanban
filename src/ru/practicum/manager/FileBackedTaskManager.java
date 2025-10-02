@@ -143,7 +143,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void loadFromFile(File file) {
         if (!file.exists()) {
-            return; // Если файла не существует, просто завершаем метод
+            return;
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
@@ -153,30 +153,28 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
             while ((line = reader.readLine()) != null) {
                 if (!isHeaderRead) {
-                    // Пропускаем заголовок
                     isHeaderRead = true;
                     continue;
                 }
 
                 if (line.trim().isEmpty()) {
-                    continue; // Пропускаем пустые строки
+                    continue;
                 }
 
+                System.out.println("Текущая строка: " + line);
+
                 if (line.contains("HISTORY:")) {
-                    // Начинаем считывать историю
                     while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
                         try {
                             int id = Integer.parseInt(line.trim());
                             historyIds.add(String.valueOf(id));
                         } catch (NumberFormatException e) {
-                            // Обработка некорректных ID
                             System.err.println("Некорректный ID в истории: " + line);
                         }
                     }
-                    break;
+                    continue;
                 }
 
-                System.out.println("Текущая строка: " + line);
                 String[] parts = line.split(",");
                 if (parts.length < 5) {
                     System.err.println("Строка не соответствует формату: " + line);
@@ -198,9 +196,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
             }
 
-            // Восстанавливаем историю
             restoreHistory(historyIds);
-
         } catch (IOException e) {
             throw new ManagerSaveException("Не удалось прочитать данные из файла", e);
         }
