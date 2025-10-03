@@ -88,6 +88,14 @@ public class Task {
     public int hashCode() {
         return Objects.hash(id, title, description, status);
     }
+
+    public TaskType getType() {
+        return TaskType.TASK;
+    }
+
+    public String toCSVStr() {
+        return String.format("%d,%s,%s,%s,%s,", id, getType(), title, status, description);
+    }
 }
 
 

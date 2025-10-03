@@ -64,4 +64,14 @@ public class Epic extends Task {
     public int hashCode() {
         return Objects.hash(super.hashCode(), subtasks);
     }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
+    }
+
+    @Override
+    public String toCSVStr() {
+        return String.format("%d,%s,%s,%s,%s,", getId(), getType(), getTitle(), getStatus(), getDescription());
+    }
 }
