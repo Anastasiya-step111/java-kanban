@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -120,25 +121,50 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             writer.write("id,type,title,status,description,startTime,duration,epic\n");
 
-            for (Task task : getAllTasks()) {
-                writer.write(task.toCSVStr() + "\n");
-            }
-            for (Subtask subtask : getAllSubtasks()) {
-                writer.write(subtask.toCSVStr() + "\n");
-            }
-            for (Epic epic : getAllEpics()) {
-                writer.write(epic.toCSVStr() + "\n");
-            }
+            getAllTasks().stream()
+                    .map(Task::toCSVStr)
+                    .forEach(line -> {
+                        try {
+                            writer.write(line + "\n");
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
 
+            getAllSubtasks().stream()
+                    .map(Subtask::toCSVStr)
+                    .forEach(line -> {
+                        try {
+                            writer.write(line + "\n");
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+
+            getAllEpics().stream()
+                    .map(Epic::toCSVStr)
+                    .forEach(line -> {
+                        try {
+                            writer.write(line + "\n");
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
 
             List<Task> history = getHistory();
             if (!history.isEmpty()) {
                 writer.write("\nHISTORY:\n");
-                for (Task task : history) {
-                    writer.write(task.getId() + "\n");
-                }
+                history.stream()
+                        .map(Task::getId)
+                        .map(String::valueOf)
+                        .forEach(line -> {
+                            try {
+                                writer.write(line + "\n");
+                            } catch (IOException e) {
+                                throw new UncheckedIOException(e);
+                            }
+                        });
             }
-
         } catch (IOException e) {
             throw new ManagerSaveException("Не удалось сохранить данные в файл", e);
         }
@@ -248,16 +274,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private void restoreHistory(List<String> historyIds) {
-        for (String idStr : historyIds) {
-            try {
-                int id = Integer.parseInt(idStr);
-                Task task = getTaskById(id);
-                if (task != null) {
-                    historyManager.add(task);
-                }
-            } catch (NumberFormatException e) {
-                System.err.println("Ошибка восстановления истории: " + idStr);
-            }
-        }
+        historyIds.stream()
+                .peek(idStr -> {
+                    try {
+                        Integer.parseInt(idStr);
+                    } catch (NumberFormatException e) {
+                        System.err.println("Ошибка восстановления истории: " + idStr);
+                    }
+                })
+                .map(Integer::parseInt)
+                .map(this::getTaskById)
+                .filter(Objects::nonNull)
+                .forEach(historyManager::add);
     }
 }
