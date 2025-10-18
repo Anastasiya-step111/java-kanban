@@ -84,12 +84,15 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task createTask(Task task) {
-        for (Task existingTask : tasks.values()) {
-            if ((Objects.equals(existingTask.getDescription(), task.getDescription()) &&
-                    Objects.equals(existingTask.getTitle(), task.getTitle()))) {
+        Optional<Task> existingTask = tasks.values().stream()
+                .filter(existing ->
+                        Objects.equals(existing.getDescription(), task.getDescription()) &&
+                                Objects.equals(existing.getTitle(), task.getTitle())
+                )
+                .findFirst();
 
-                return existingTask;
-            }
+        if (existingTask.isPresent()) {
+            return existingTask.get();
         }
 
         int id = getCurrentTaskCount();
@@ -138,19 +141,22 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic createEpic(Epic epic) {
-        for (Epic existingEpic : epics.values()) {
-            if (Objects.equals(existingEpic.getDescription(), epic.getDescription()) &&
-                    Objects.equals(existingEpic.getTitle(), epic.getTitle())) {
+        Epic existingEpic = epics.values().stream()
+                .filter(existing ->
+                        Objects.equals(existing.getDescription(), epic.getDescription()) &&
+                                Objects.equals(existing.getTitle(), epic.getTitle())
+                )
+                .findFirst()
+                .orElse(null);
 
-                return existingEpic;
-            }
+        if (existingEpic != null) {
+            return existingEpic;
         }
 
         int id = getCurrentTaskCount();
         epic.setId(id);
         addPrioritizedTask(epic);
         epics.put(id, epic);
-
         return epic;
     }
 
@@ -258,12 +264,17 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Subtask createSubtask(Subtask subtask) {
-        for (Subtask existingSubtask : subtasks.values()) {
-            if (Objects.equals(existingSubtask.getTitle(), subtask.getTitle()) &&
-                    Objects.equals(existingSubtask.getDescription(), subtask.getDescription()) &&
-                    existingSubtask.getEpicId() == subtask.getEpicId()) {
-                return existingSubtask;
-            }
+        Subtask existingSubtask = subtasks.values().stream()
+                .filter(existing ->
+                        Objects.equals(existing.getTitle(), subtask.getTitle()) &&
+                                Objects.equals(existing.getDescription(), subtask.getDescription()) &&
+                                existing.getEpicId() == subtask.getEpicId()
+                )
+                .findFirst()
+                .orElse(null);
+
+        if (existingSubtask != null) {
+            return existingSubtask;
         }
 
         int id = getCurrentTaskCount();
@@ -286,7 +297,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllSubtasks() {
         subtasks.values().stream()
-                .filter(Objects::nonNull) // Проверяем на null
+                .filter(Objects::nonNull)
                 .peek(subtask -> prioritizedTasks.remove(subtask))
                 .forEach(subtask -> {
                     Epic epic = epics.get(subtask.getEpicId());
