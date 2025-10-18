@@ -1,9 +1,12 @@
 package ru.practicum.manager;
 
+import ru.practicum.CustomDateTimeFormatter;
 import ru.practicum.model.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,7 +118,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
-            writer.write("id,type,name,status,description,epic\n");
+            writer.write("id,type,title,status,description,startTime,duration,epic\n");
 
             for (Task task : getAllTasks()) {
                 writer.write(task.toCSVStr() + "\n");
@@ -207,20 +210,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String title = parts[2];
         Status status = Status.valueOf(parts[3]);
         String description = parts[4];
+        LocalDateTime startTime = LocalDateTime.parse(parts[5], CustomDateTimeFormatter.DATE_TIME_FORMATTER);
+        Duration duration = Duration.ofMinutes(Long.parseLong(parts[6]));
 
-        Task task = new Task(title, description, this, status);
+        Task task = new Task(title, description, this, status, startTime, duration);
         task.setId(id);
         createTask(task);
     }
 
     private void addSubtaskFromCSV(String[] parts) {
         int id = Integer.parseInt(parts[0]);
-        int epicId = Integer.parseInt(parts[5]);
         String title = parts[2];
         Status status = Status.valueOf(parts[3]);
         String description = parts[4];
+        LocalDateTime startTime = LocalDateTime.parse(parts[5], CustomDateTimeFormatter.DATE_TIME_FORMATTER);
+        Duration duration = Duration.ofMinutes(Long.parseLong(parts[6]));
+        int epicId = Integer.parseInt(parts[7]);
 
-        Subtask subtask = new Subtask(title, description, this, epicId, status);
+        Subtask subtask = new Subtask(title, description, this, epicId, status, startTime, duration);
         subtask.setId(id);
         createSubtask(subtask);
     }
@@ -230,9 +237,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String title = parts[2];
         Status status = Status.valueOf(parts[3]);
         String description = parts[4];
+        LocalDateTime startTime = LocalDateTime.parse(parts[5], CustomDateTimeFormatter.DATE_TIME_FORMATTER);
+        Duration duration = Duration.ofMinutes(Long.parseLong(parts[6]));
 
         Epic epic = new Epic(title, description, this, status);
         epic.setId(id);
+        epic.setStartTime(startTime);
+        epic.setDuration(duration);
         createEpic(epic);
     }
 
