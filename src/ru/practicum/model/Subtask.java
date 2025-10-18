@@ -1,14 +1,18 @@
 package ru.practicum.model;
 
+import ru.practicum.CustomDateTimeFormatter;
 import ru.practicum.manager.TaskManager;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Subtask extends Task {
     private int epicId;
 
-    public Subtask(String title, String description, TaskManager taskManager, int epicId, Status status) {
-        super(title, description, taskManager, status);
+    public Subtask(String title, String description, TaskManager taskManager, int epicId, Status status,
+                   LocalDateTime startTime, Duration duration) {
+        super(title, description, taskManager, status, startTime, duration);
         this.epicId = epicId;
     }
 
@@ -38,8 +42,17 @@ public class Subtask extends Task {
         return String.format("Подзадача №%d: %s\n" +
                         "Статус: %s\n" +
                         "Описание: %s\n" +
+                        "Начало: %s\n" +
+                        "Длительность: %d ч. %d мин.\n" +
                         "Принадлежит эпику №%d",
-                getId(), getTitle(), getStatus(), getDescription(), getEpicId());
+                getId(), getTitle(), getStatus(), getDescription(),
+
+                getStartTime() != null ? getStartTime().format(CustomDateTimeFormatter.DATE_TIME_FORMATTER) : "Не задано",
+
+                getDuration() != null ? getDuration().toHours() : 0,
+                getDuration() != null ? getDuration().toMinutesPart() : 0,
+
+                getEpicId());
     }
 
     @Override
@@ -65,7 +78,9 @@ public class Subtask extends Task {
 
     @Override
     public String toCSVStr() {
+        String startTimeStr = (getStartTime() != null) ? getStartTime().toString() : "";
+        String durationStr = (getDuration() != null) ? String.valueOf(getDuration().toMinutes()) : "";
         return String.format("%d,%s,%s,%s,%s,%d", getId(), getType(), getTitle(), getStatus(), getDescription(),
-                getEpicId());
+                startTimeStr, durationStr, getEpicId());
     }
 }

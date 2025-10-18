@@ -1,7 +1,10 @@
 package ru.practicum.model;
 
+import ru.practicum.CustomDateTimeFormatter;
 import ru.practicum.manager.TaskManager;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -9,14 +12,19 @@ public class Task {
     private String description;
     private int id;
     private Status status;
+    private LocalDateTime startTime;
+    private Duration duration;
 
     protected TaskManager taskManager;
 
-    public Task(String title, String description, TaskManager taskManager, Status status) {
+    public Task(String title, String description, TaskManager taskManager, Status status,
+                LocalDateTime startTime, Duration duration) {
         this.title = title;
         this.description = description;
         this.taskManager = taskManager;
         this.status = status;
+        this.startTime = startTime;
+        this.duration = duration;
     }
 
     public String getTitle() {
@@ -62,22 +70,51 @@ public class Task {
         taskManager.update(this);
     }
 
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getEndTime() {
+        LocalDateTime endTime = startTime.plus(duration);
+        return endTime;
+    }
+
     @Override
     public String toString() {
         return String.format("Задача №%d: %s\n" +
                         "Статус: %s\n" +
-                        "Описание: %s",
-                getId(), getTitle(), getStatus(), getDescription());
+                        "Описание: %s\n" +
+                        "Начало: %s\n" +
+                        "Длительность: %d ч. %d мин.\n",
+
+                getId(), getTitle(), getStatus(), getDescription(),
+
+                startTime != null ? startTime.format(CustomDateTimeFormatter.DATE_TIME_FORMATTER) : "Не задано",
+
+                duration != null ? duration.toHours() : 0,
+                duration != null ? duration.toMinutesPart() : 0
+        );
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true; // Проверка на идентичность
-        if (o == null || getClass() != o.getClass()) return false; // Проверка на null и тип
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        Task task = (Task) o; // Приведение типа
+        Task task = (Task) o;
 
-        // Сравнение всех значимых полей
         return id == task.id &&
                 status == task.status &&
                 Objects.equals(title, task.title) &&
@@ -94,7 +131,10 @@ public class Task {
     }
 
     public String toCSVStr() {
-        return String.format("%d,%s,%s,%s,%s,", id, getType(), title, status, description);
+        String startTimeStr = (getStartTime() != null) ? getStartTime().toString() : "";
+        String durationStr = (getDuration() != null) ? String.valueOf(getDuration().toMinutes()) : "";
+        return String.format("%d,%s,%s,%s,%s,%s,%s", id, getType(), title, status, description,
+                startTimeStr, durationStr);
     }
 }
 
