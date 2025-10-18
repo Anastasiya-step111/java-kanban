@@ -5,6 +5,7 @@ import ru.practicum.model.Subtask;
 import ru.practicum.model.Task;
 
 import java.util.List;
+import java.util.TreeSet;
 
 public interface TaskManager {
 
@@ -53,4 +54,12 @@ public interface TaskManager {
         List<Task> getHistory();
 
         HistoryManager getHistoryManager();
+
+        List<Task> getPrioritizedTasks();
+
+        boolean checkForConflicts(Task task);
+
+        void addPrioritizedTask(Task task);
+
+        void updatePriotizedTask(Task task);
 }
