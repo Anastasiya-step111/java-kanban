@@ -7,6 +7,8 @@ import ru.practicum.model.Task;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class InMemoryTaskManager implements TaskManager {
     protected static int taskCount = 1;
@@ -94,10 +96,11 @@ public class InMemoryTaskManager implements TaskManager {
         if (existingTask.isPresent()) {
             return existingTask.get();
         }
-
+        if (checkForConflicts(task)) {
+            throw new ManagerSaveException("Подзадача пересекается по времени с существующими задачами");
+        }
         int id = getCurrentTaskCount();
         task.setId(id);
-        addPrioritizedTask(task);
         tasks.put(id, task);
         return task;
     }
@@ -105,22 +108,17 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) {
         if (tasks.containsKey(task.getId())) {
-            updatePriotizedTask(task);
             tasks.put(task.getId(), task);
         }
     }
 
     @Override
     public void deleteTask(int id) {
-
-        prioritizedTasks.remove(getTaskById(id));
         tasks.remove(id);
     }
 
     @Override
     public void deleteAllTasks() {
-
-        tasks.values().stream().forEach(task -> prioritizedTasks.remove(task));
         tasks.clear();
     }
 
@@ -152,10 +150,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (existingEpic != null) {
             return existingEpic;
         }
-
         int id = getCurrentTaskCount();
         epic.setId(id);
-        addPrioritizedTask(epic);
         epics.put(id, epic);
         return epic;
     }
@@ -200,7 +196,6 @@ public class InMemoryTaskManager implements TaskManager {
         epic.setStatus(newStatus);
         epic.setStartTime(epic.getStartTime());
         epic.setDuration(epic.getDuration());
-        updatePriotizedTask(epic);
         epics.put(epic.getId(), epic);
     }
 
@@ -215,7 +210,6 @@ public class InMemoryTaskManager implements TaskManager {
                     .forEach(subtask -> {
                         if (subtask != null) {
                             subtasks.remove(subtask.getId());
-                            prioritizedTasks.remove(subtask);
                         }
                     });
         }
@@ -224,11 +218,8 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllEpics() {
         getAllEpics().forEach(epic -> {
-            prioritizedTasks.remove(epic);
-
             epic.getSubtasks().forEach(subtask -> {
                 subtasks.remove(subtask.getId());
-                prioritizedTasks.remove(subtask);
             });
         });
 
@@ -276,10 +267,11 @@ public class InMemoryTaskManager implements TaskManager {
         if (existingSubtask != null) {
             return existingSubtask;
         }
-
+        if (checkForConflicts(subtask)) {
+            throw new ManagerSaveException("Подзадача пересекается по времени с существующими задачами");
+        }
         int id = getCurrentTaskCount();
         subtask.setId(id);
-        addPrioritizedTask(subtask);
         subtasks.put(id, subtask);
 
         int epicId = subtask.getEpicId();
@@ -296,11 +288,15 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllSubtasks() {
-        subtasks.values().stream()
+        List<Integer> subtaskIds = new ArrayList<>(subtasks.keySet());
+
+        subtaskIds.stream()
+                .map(subtasks::remove)
                 .filter(Objects::nonNull)
-                .peek(subtask -> prioritizedTasks.remove(subtask))
                 .forEach(subtask -> {
-                    Epic epic = epics.get(subtask.getEpicId());
+                    int epicId = subtask.getEpicId();
+                    Epic epic = epics.get(epicId);
+
                     if (epic != null) {
                         epic.removeSubtask(subtask);
                         updateEpic(epic);
@@ -313,7 +309,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeSubtaskById(int id) {
         Subtask subtask = subtasks.remove(id);
-        prioritizedTasks.remove(subtask);
 
         if (subtask != null) {
             int epicId = subtask.getEpicId();
@@ -342,10 +337,8 @@ public class InMemoryTaskManager implements TaskManager {
 
         epic.getSubtasks().removeIf(subtask -> subtask.getId() == updateSubtaskId);
 
-
-
         updatedSubtask.setId(updateSubtaskId);
-        updatePriotizedTask(updatedSubtask);
+
         subtasks.put(updateSubtaskId, updatedSubtask);
         epic.addSubtask(updatedSubtask);
         updateEpic(epic);
@@ -353,56 +346,63 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getPrioritizedTasks() {
-        if (prioritizedTasks == null) {
-            return Collections.emptyList();
-        }
-        return new ArrayList<>(prioritizedTasks);
-    }
-
-    @Override
-    public boolean checkForConflicts(Task task) { // Метод вернет true, если есть хотя бы один конфликт
-        return prioritizedTasks.stream()
-                .anyMatch(existingTask -> task.isTimeConflict(existingTask));
-    }
-
-    @Override
-    public void addPrioritizedTask(Task task) {
-        try {
-            if (task == null) {
-                throw new NullPointerException("Задача не может быть null");
-            }
-
-            if (checkForConflicts(task)) {
-                throw new IllegalArgumentException("Конфликт времени с существующей задачей");
-            }
-
-            prioritizedTasks.add(task);
-
-        } catch (NullPointerException e) {
-            System.err.println("Ошибка: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
-            System.err.println("Ошибка: " + e.getMessage());
-        } catch (Exception e) {
-            System.err.println("Произошла непредвиденная ошибка: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public void updatePriotizedTask(Task task) {
-        if (task == null) {
-            throw new IllegalArgumentException("Задача не может быть null");
-        }
-
-        TreeSet<Task> tempTasks = new TreeSet<>(prioritizedTasks);
-
-        tempTasks.stream()
-                .filter(existingTask ->
-                        existingTask.getTitle().equals(task.getTitle()) &&
-                                existingTask.getDescription().equals(task.getDescription())
+        return Stream.of(
+                        getAllTasks(),
+                        getAllSubtasks(),
+                        getAllEpics()
                 )
-                .forEach(existingTask -> prioritizedTasks.remove(existingTask));
-
-        addPrioritizedTask(task);
+                .flatMap(List::stream)
+                .filter(task -> task.getStartTime() != null)
+                .sorted(Comparator.comparing(
+                        Task::getStartTime,
+                        Comparator.nullsLast(Comparator.naturalOrder())
+                ))
+                .collect(Collectors.toList());
     }
+
+    private boolean isTimeConflict(Task task1, Task task2) { // вернет true если пересекаются
+        if (task1.getStartTime() == null || task2.getStartTime() == null) {
+            return false;
+        }
+        LocalDateTime end1 = task1.getEndTime();
+        LocalDateTime end2 = task2.getEndTime();
+        return !end1.isBefore(task2.getStartTime()) && !end2.isBefore(task1.getStartTime());
+    }
+
+    private boolean checkForConflicts(Task newTask) { // Метод вернет true, если есть хотя бы один конфликт
+        if (newTask.getStartTime() == null || newTask.getEndTime() == null) {
+            return false;
+        }
+
+        return Stream.concat(
+                        getAllTasks().stream(),
+                        getAllSubtasks().stream()
+                )
+                .anyMatch(task -> isTimeConflict(task, newTask));
+    }
+
+//    private void removeTaskFromPrioritized(Task task) {
+//        prioritizedTasks.remove(task);
+//    }
+
+//    private void updatePrioritizedTask(Task task) {
+//        if (task == null) {
+//            throw new IllegalArgumentException("Задача не может быть null");
+//        }
+//
+//        TreeSet<Task> tempTasks = new TreeSet<>(prioritizedTasks);
+//
+//        tempTasks.stream()
+//                .filter(existingTask ->
+//                        existingTask.getTitle().equals(task.getTitle()) &&
+//                                existingTask.getDescription().equals(task.getDescription())
+//                )
+//                .forEach(existingTask -> removeTaskFromPrioritized(existingTask));
+//
+//        if (checkForConflicts(task)) {
+//            throw new ManagerSaveException("Подзадача пересекается по времени с существующими задачами");
+//        }
+//        addPrioritizedTask(task);
+//    }
 
 }

@@ -57,9 +57,4 @@ public interface TaskManager {
 
         List<Task> getPrioritizedTasks();
 
-        boolean checkForConflicts(Task task);
-
-        void addPrioritizedTask(Task task);
-
-        void updatePriotizedTask(Task task);
 }
