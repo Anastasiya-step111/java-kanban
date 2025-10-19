@@ -138,24 +138,7 @@ public class Task {
     }
 
 
-    public boolean isTimeConflict(Task task) { // вернет true если пересекаются
-        LocalDateTime start1 = getStartTime();
-        LocalDateTime end1 = getEndTime();
 
-        // Получаем временные рамки переданной задачи
-        LocalDateTime start2 = task.getStartTime();
-        LocalDateTime end2 = task.getEndTime();
-
-        // Проверка на null для безопасности
-        if (start1 == null || end1 == null || start2 == null || end2 == null) {
-            return false; // или throw исключение, в зависимости от требований
-        }
-
-        // Математический метод проверки наложения отрезков:
-        // Отрезки пересекаются, если:
-        // max(начало1, начало2) <= min(конец1, конец2)
-        return ! (end1.isBefore(start2) || start1.isAfter(end2));
-    }
 }
 
 
