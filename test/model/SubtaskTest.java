@@ -12,6 +12,8 @@ import ru.practicum.model.Subtask;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -25,6 +27,21 @@ class SubtaskTest {
     Subtask subtask2;
     Subtask subtask3;
 
+    LocalDateTime startTime1 = LocalDateTime.of(2027, 10, 1, 8, 0);
+    Duration duration1 = Duration.ofHours(1);
+
+    LocalDateTime startTime2 = LocalDateTime.of(2027, 10, 3, 9, 0);
+    Duration duration2 = Duration.ofHours(2);
+
+    LocalDateTime startTime3 = LocalDateTime.of(2027, 10, 5, 11, 0);
+    Duration duration3 = Duration.ofHours(1);
+
+    LocalDateTime startTime4 = LocalDateTime.of(2027, 10, 7, 12, 0);
+    Duration duration4 = Duration.ofHours(1);
+
+    LocalDateTime startTime5 = LocalDateTime.of(2027, 10, 9, 13, 0);
+    Duration duration5 = Duration.ofHours(2);
+
     @BeforeEach
     public void beforeEach() {
         epic1 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача", manager,
@@ -32,22 +49,23 @@ class SubtaskTest {
         epic2 = manager.createEpic(new Epic("Разобраться с ошибкой по коробке", "Не горит", manager,
                 Status.NEW));
 
+
         subtask1 = manager.createSubtask(new Subtask("Найти репетитора", "Почитать отзывы", manager,
-                epic1.getId(), Status.NEW));
-        subtask2 = manager.createSubtask(new Subtask("Разбираться в IDEA",
-                "Переводить все встреченные слова", manager, epic1.getId(), Status.NEW));
+                epic1.getId(), Status.NEW, startTime1, duration1));
+        subtask2 = manager.createSubtask(new Subtask("Разбираться в IDEA", "Переводить все встреченные " +
+                "слова", manager, epic1.getId(), Status.NEW, startTime2, duration2));
         subtask3 = manager.createSubtask(new Subtask("Изучить вопрос на драйв2",
-                "Сделать список вариантов", manager, epic2.getId(), Status.NEW));
+                "Сделать список вариантов", manager, epic2.getId(), Status.NEW, startTime3, duration3));
     }
 
     @Test
-    void testEpicEquals() {
+    void testSubtaskEquals() {
         assertTrue(subtask1.equals(subtask1), "Объект должен быть равен самому себе");
 
         Epic epicDuplicate1 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача",
                 manager, Status.NEW));
         Subtask subtaskDuplicate1 = manager.createSubtask(new Subtask("Найти репетитора",
-                "Почитать отзывы", manager, epicDuplicate1.getId(), Status.NEW));
+                "Почитать отзывы", manager, epicDuplicate1.getId(), Status.NEW,  startTime1, duration1));
 
         assertTrue(subtask1.equals(subtaskDuplicate1), "Идентичные подзадачи должны быть равны");
         assertEquals(subtask1.getId(), subtaskDuplicate1.getId(), "IDs идентичных подзадач должны совпадать");
@@ -139,20 +157,19 @@ class SubtaskTest {
         assertNotEquals(0, subtask1.getId(), "ID подзадачи не должен быть нулевым");
 
         Subtask subtaskDuplicate1 = manager.createSubtask(new Subtask("Найти репетитора",
-                "Почитать отзывы", manager,
-                epic1.getId(), Status.NEW));
+                "Почитать отзывы", manager, epic1.getId(), Status.NEW, startTime1, duration1));
         assertEquals(subtask1, subtaskDuplicate1, "При добавлении идентичной подзадачи должна вернуться " +
                 "существующая подзадача");
 
         Subtask emptyDescriptionSubtask = manager.createSubtask(
-                new Subtask("Подзадача без описания", "", manager, epic2.getId(), Status.NEW)
-        );
+                new Subtask("Подзадача без описания", "", manager, epic2.getId(), Status.NEW,
+                        startTime4, duration4));
 
         assertNotNull(emptyDescriptionSubtask, "Должна создать подзадачу с пустым описанием");
 
         Subtask emptyTitleSubtask = manager.createSubtask(
-                new Subtask("", "Описание подзадачи без названия", manager, epic2.getId(), Status.NEW)
-        );
+                new Subtask("", "Описание подзадачи без названия", manager, epic2.getId(), Status.NEW,
+                        startTime5, duration5));
 
         assertNotNull(emptyTitleSubtask, "Должна создать подзадачу с пустым названием");
 
@@ -208,7 +225,9 @@ class SubtaskTest {
                 newDescription,
                 manager,
                 subtask1.getEpicId(),
-                newStatus
+                newStatus,
+                startTime4,
+                duration4
         );
 
         manager.updateSubtask(updatedSubtask, subtask1.getId());

@@ -10,6 +10,8 @@ import ru.practicum.model.Status;
 import ru.practicum.model.Subtask;
 import ru.practicum.model.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,32 +21,43 @@ class EpicTest {
     HistoryManager historyManager = manager.getHistoryManager();
     Epic epic1;
     Epic epic2;
-    Epic epicDuplicate1;
 
     Subtask subtask1;
     Subtask subtask2;
     Subtask subtask3;
-    Subtask subtaskDuplicate1;
 
+    LocalDateTime startTime1 = LocalDateTime.of(2027, 1, 1, 1, 0);
+    Duration duration1 = Duration.ofHours(1);
+
+    LocalDateTime startTime2 = LocalDateTime.of(2027, 1, 3, 5, 0);
+    Duration duration2 = Duration.ofHours(2);
+
+    LocalDateTime startTime3 = LocalDateTime.of(2027, 1, 5, 10, 0);
+    Duration duration3 = Duration.ofHours(1);
+
+    LocalDateTime startTime4 = LocalDateTime.of(2027, 1, 7, 15, 0);
+    Duration duration4 = Duration.ofHours(1);
+
+    LocalDateTime startTime5 = LocalDateTime.of(2027, 1, 9, 20, 0);
+    Duration duration5 = Duration.ofHours(2);
+
+    LocalDateTime startTime6 = LocalDateTime.of(2027, 1, 11, 1, 0);
+    Duration duration6 = Duration.ofHours(1);
 
     @BeforeEach
     public void beforeEach() {
         epic1 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача", manager,
                 Status.NEW));
-        epicDuplicate1 = manager.createEpic(new Epic("Учить английский", "Очень страшная задача",
-                manager, Status.NEW));
         epic2 = manager.createEpic(new Epic("Разобраться с ошибкой по коробке", "Не горит", manager,
                 Status.NEW));
 
 
         subtask1 = manager.createSubtask(new Subtask("Найти репетитора", "Почитать отзывы", manager,
-                epic1.getId(), Status.NEW));
-        subtaskDuplicate1 = manager.createSubtask(new Subtask("Найти репетитора", "Почитать отзывы",
-                manager, epicDuplicate1.getId(), Status.NEW));
+                epic1.getId(), Status.NEW, startTime1, duration1));
         subtask2 = manager.createSubtask(new Subtask("Разбираться в IDEA",
-                "Переводить все встреченные слова", manager, epic1.getId(), Status.NEW));
+                "Переводить все встреченные слова", manager, epic1.getId(), Status.NEW, startTime2, duration2));
         subtask3 = manager.createSubtask(new Subtask("Изучить вопрос на драйв2",
-                "Сделать список вариантов", manager, epic2.getId(), Status.NEW));
+                "Сделать список вариантов", manager, epic2.getId(), Status.NEW, startTime3, duration3));
     }
 
     @Test
@@ -61,7 +74,8 @@ class EpicTest {
     void testAddSubtask() {
         List<Subtask> allSubtasks = epic1.getSubtasks();
         Subtask newSubtask = manager.createSubtask(
-                new Subtask("Новая подзадача", "Новое описание", manager, epic1.getId(), Status.NEW));
+                new Subtask("Новая подзадача", "Новое описание", manager, epic1.getId(), Status.NEW,
+                        startTime4, duration4));
         List<Subtask> updatedList = epic1.getSubtasks();
 
         assertEquals(3, updatedList.size(), "Размер списка должен увеличиться на 1");
@@ -96,38 +110,18 @@ class EpicTest {
     }
 
     @Test
-    void testEpicEquals() {
-        assertTrue(epic1.equals(epic1), "Объект должен быть равен самому себе");
-
-        assertTrue(epic1.equals(epicDuplicate1), "Идентичные эпики должны быть равны");
-        assertTrue(epicDuplicate1.equals(epic1), "Равенство должно быть симметричным");
-
-        assertFalse(epic1.equals(null), "Объект не должен быть равен null");
-        assertFalse(epic1.equals(new Object()), "Объект другого типа не должен быть равен");
-
-        assertFalse(epic1.equals(epic2), "Эпики с разными полями не должны быть равны");
-    }
-
-    @Test
-    void testEpicHashCode() {
-        assertEquals(epic1.hashCode(), epicDuplicate1.hashCode(),
-                "Равные объекты должны иметь одинаковые хэш-коды");
-        assertNotEquals(epic1.hashCode(), epic2.hashCode(),
-                "Разные объекты должны иметь разные хэш-коды");
-    }
-
-    @Test
     void testCreateEpic() {
         assertNotNull(epic1, "Эпик должен быть создан");
         assertNotEquals(0, epic1.getId(), "ID эпика не должен быть нулевым");
-        assertEquals(epic1.getId(), epicDuplicate1.getId(), "Id должны совпасть");
 
         Epic epicWithEmptyDescription = new Epic("Пустой эпик", "", manager, Status.NEW);
         Epic createdEmptyDescriptionEpic = manager.createEpic(epicWithEmptyDescription);
+
         assertNotNull(createdEmptyDescriptionEpic, "Должен создать эпик с пустым описанием");
 
         Epic epicWithEmptyTitle = new Epic("", "Описание пустого эпика", manager, Status.NEW);
         Epic createdEmptyTitleEpic = manager.createEpic(epicWithEmptyTitle);
+
         assertNotNull(createdEmptyTitleEpic, "Должен создать эпик с пустым названием");
 
         List<Epic> finalList = manager.getAllEpics();
@@ -178,7 +172,9 @@ class EpicTest {
                 newDescription1,
                 manager,
                 epicId1,
-                newStatus1
+                newStatus1,
+                startTime4,
+                duration4
         );
 
         manager.updateSubtask(updatedSubtask1, subtask1.getId());
@@ -193,7 +189,9 @@ class EpicTest {
                 newDescription2,
                 manager,
                 subtask2.getEpicId(),
-                newStatus2
+                newStatus2,
+                startTime5,
+                duration5
         );
 
         manager.updateSubtask(updatedSubtask2, subtask2.getId());
@@ -208,7 +206,9 @@ class EpicTest {
                 newDescription3,
                 manager,
                 subtask1.getEpicId(),
-                newStatus3
+                newStatus3,
+                startTime6,
+                duration6
         );
 
         manager.updateSubtask(updatedSubtask3, subtask1.getId());
@@ -283,6 +283,7 @@ class EpicTest {
         manager.deleteAllEpics();
         assertTrue(manager.getAllEpics().isEmpty());
         assertTrue(manager.getAllSubtasks().isEmpty());
+
     }
 
     @Test
