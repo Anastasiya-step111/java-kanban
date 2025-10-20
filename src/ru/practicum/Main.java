@@ -59,8 +59,8 @@ public class Main {
         TaskManager manager2 = Managers.getFileBackedManager(tempFile);
 
         System.out.println("В менеджере2 хранится: " + manager2.getAllTasks().size() + " задач.\n" +
-                + manager2.getAllEpics().size() + " эпиков.\n" +
-                + manager2.getAllSubtasks().size() + " подзадач.");
+                +manager2.getAllEpics().size() + " эпиков.\n" +
+                +manager2.getAllSubtasks().size() + " подзадач.");
 
     }
 }

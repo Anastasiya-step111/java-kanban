@@ -22,7 +22,6 @@ public class Epic extends Task {
         if (subtasks.isEmpty()) {
             return null;
         }
-        
         return subtasks.stream()
                 .map(Subtask::getStartTime)
                 .filter(Objects::nonNull)
@@ -64,11 +63,9 @@ public class Epic extends Task {
         if (subtask == this) {
             throw new IllegalArgumentException("Нельзя добавить эпик как подзадачу самому себе");
         }
-
         if (!(subtask instanceof Subtask)) {
             throw new IllegalArgumentException("Можно добавлять только подзадачи");
         }
-
         Subtask task = (Subtask) subtask;
 
         if (!subtasks.contains(task)) {
