@@ -1,4 +1,4 @@
-package manager;
+package taskManager;
 
 import ru.practicum.manager.HistoryManager;
 import ru.practicum.manager.Managers;
