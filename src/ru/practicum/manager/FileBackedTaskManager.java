@@ -1,6 +1,5 @@
 package ru.practicum.manager;
 
-import ru.practicum.CustomDateTimeFormatter;
 import ru.practicum.model.*;
 
 import java.io.*;
@@ -9,7 +8,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -170,7 +168,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    private void loadFromFile(File file) {
+    public void loadFromFile(File file) {
         if (!file.exists()) {
             return;
         }
@@ -178,7 +176,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
             String line;
             boolean isHeaderRead = false;
-            List<String> historyIds = new ArrayList<>();
+            List<Integer> historyIds = new ArrayList<>();
 
             while ((line = reader.readLine()) != null) {
                 if (!isHeaderRead) {
@@ -196,7 +194,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
                         try {
                             int id = Integer.parseInt(line.trim());
-                            historyIds.add(String.valueOf(id));
+                            //historyIds.add(String.valueOf(id));
                         } catch (NumberFormatException e) {
                             System.err.println("Некорректный ID в истории: " + line);
                         }
@@ -236,8 +234,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String title = parts[2];
         Status status = Status.valueOf(parts[3]);
         String description = parts[4];
-        LocalDateTime startTime = LocalDateTime.parse(parts[5], CustomDateTimeFormatter.DATE_TIME_FORMATTER);
-        Duration duration = Duration.ofMinutes(Long.parseLong(parts[6]));
+        LocalDateTime startTime = parts[5].isEmpty() ? null : LocalDateTime.parse(parts[5]);
+        Duration duration = parts[6].isEmpty() ? null : Duration.ofMinutes(Long.parseLong(parts[6]));
 
         Task task = new Task(title, description, this, status, startTime, duration);
         task.setId(id);
@@ -249,8 +247,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String title = parts[2];
         Status status = Status.valueOf(parts[3]);
         String description = parts[4];
-        LocalDateTime startTime = LocalDateTime.parse(parts[5], CustomDateTimeFormatter.DATE_TIME_FORMATTER);
-        Duration duration = Duration.ofMinutes(Long.parseLong(parts[6]));
+        LocalDateTime startTime = parts[5].isEmpty() ? null : LocalDateTime.parse(parts[5]);
+        Duration duration = parts[6].isEmpty() ? null : Duration.ofMinutes(Long.parseLong(parts[6]));
         int epicId = Integer.parseInt(parts[7]);
 
         Subtask subtask = new Subtask(title, description, this, epicId, status, startTime, duration);
@@ -263,8 +261,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String title = parts[2];
         Status status = Status.valueOf(parts[3]);
         String description = parts[4];
-        LocalDateTime startTime = LocalDateTime.parse(parts[5], CustomDateTimeFormatter.DATE_TIME_FORMATTER);
-        Duration duration = Duration.ofMinutes(Long.parseLong(parts[6]));
+        LocalDateTime startTime = parts[5].isEmpty() ? null : LocalDateTime.parse(parts[5]);
+        Duration duration = parts[6].isEmpty() ? null : Duration.ofMinutes(Long.parseLong(parts[6]));
 
         Epic epic = new Epic(title, description, this, status);
         epic.setId(id);
@@ -273,18 +271,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         createEpic(epic);
     }
 
-    private void restoreHistory(List<String> historyIds) {
-        historyIds.stream()
-                .peek(idStr -> {
-                    try {
-                        Integer.parseInt(idStr);
-                    } catch (NumberFormatException e) {
-                        System.err.println("Ошибка восстановления истории: " + idStr);
-                    }
-                })
-                .map(Integer::parseInt)
-                .map(this::getTaskById)
-                .filter(Objects::nonNull)
-                .forEach(historyManager::add);
+    private void restoreHistory(List<Integer> historyIds) {
+        for (int id : historyIds) {
+            Task task = tasks.get(id);
+            if (task != null) {
+                historyManager.add(task);
+                continue;
+            }
+            Epic epic = epics.get(id);
+            if (epic != null) {
+                historyManager.add(epic);
+                continue;
+            }
+            Subtask subtask = subtasks.get(id);
+            if (subtask != null) {
+                historyManager.add(subtask);
+            }
+        }
     }
 }
