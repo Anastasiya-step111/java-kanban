@@ -27,6 +27,17 @@ public class Task {
         this.duration = duration;
     }
 
+    public Task(String title, String description, int id, TaskManager taskManager, Status status,
+                LocalDateTime startTime, Duration duration) {
+        this.title = title;
+        this.description = description;
+        this.id = id;
+        this.taskManager = taskManager;
+        this.status = status;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
     public String getTitle() {
 
         return title;
@@ -87,8 +98,10 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
-        LocalDateTime endTime = startTime.plus(duration);
-        return endTime;
+        if (startTime == null || duration == null) {
+            return null;
+        }
+        return startTime.plus(duration);
     }
 
     @Override

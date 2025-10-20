@@ -44,7 +44,7 @@ public class Subtask extends Task {
                         "Описание: %s\n" +
                         "Начало: %s\n" +
                         "Длительность: %d ч. %d мин.\n" +
-                        "Принадлежит эпику №%d",
+                        "Принадлежит эпику №%d\n",
                 getId(), getTitle(), getStatus(), getDescription(),
 
                 getStartTime() != null ? getStartTime().format(CustomDateTimeFormatter.DATE_TIME_FORMATTER) : "Не задано",

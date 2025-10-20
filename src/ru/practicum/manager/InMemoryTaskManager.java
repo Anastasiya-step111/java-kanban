@@ -7,8 +7,6 @@ import ru.practicum.model.Task;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class InMemoryTaskManager implements TaskManager {
     protected static int taskCount = 1;
@@ -89,7 +87,9 @@ public class InMemoryTaskManager implements TaskManager {
         Optional<Task> existingTask = tasks.values().stream()
                 .filter(existing ->
                         Objects.equals(existing.getDescription(), task.getDescription()) &&
-                                Objects.equals(existing.getTitle(), task.getTitle())
+                                Objects.equals(existing.getTitle(), task.getTitle()) &&
+                                Objects.equals(existing.getStartTime(), task.getStartTime()) &&
+                                Objects.equals(existing.getDuration(), task.getDuration())
                 )
                 .findFirst();
 
@@ -101,6 +101,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         int id = getCurrentTaskCount();
         task.setId(id);
+        addPrioritizedTask(task);
         tasks.put(id, task);
         return task;
     }
@@ -108,17 +109,30 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) {
         if (tasks.containsKey(task.getId())) {
+            Task oldTask = getTaskById(task.getId());
+
+            removeTaskFromPrioritized(oldTask);
+            addPrioritizedTask(task);
             tasks.put(task.getId(), task);
         }
     }
 
     @Override
     public void deleteTask(int id) {
+        removeTaskFromPrioritized(getTaskById(id));
         tasks.remove(id);
     }
 
     @Override
     public void deleteAllTasks() {
+        List<Task> taskList = new ArrayList<>(getAllTasks());
+
+        taskList.stream()
+                .forEach(task -> {
+                    removeTaskFromPrioritized(task);
+                    deleteTask(task.getId());
+                });
+
         tasks.clear();
     }
 
@@ -204,12 +218,12 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.remove(id);
 
         if (epic != null && epic.getSubtasks() != null) {
-            prioritizedTasks.remove(epic);
 
             epic.getSubtasks()
                     .forEach(subtask -> {
                         if (subtask != null) {
                             subtasks.remove(subtask.getId());
+                            removeTaskFromPrioritized(subtask);
                         }
                     });
         }
@@ -220,6 +234,7 @@ public class InMemoryTaskManager implements TaskManager {
         getAllEpics().forEach(epic -> {
             epic.getSubtasks().forEach(subtask -> {
                 subtasks.remove(subtask.getId());
+                removeTaskFromPrioritized(subtask);
             });
         });
 
@@ -259,7 +274,9 @@ public class InMemoryTaskManager implements TaskManager {
                 .filter(existing ->
                         Objects.equals(existing.getTitle(), subtask.getTitle()) &&
                                 Objects.equals(existing.getDescription(), subtask.getDescription()) &&
-                                existing.getEpicId() == subtask.getEpicId()
+                                existing.getEpicId() == subtask.getEpicId() &&
+                                Objects.equals(existing.getStartTime(), subtask.getStartTime()) &&
+                                Objects.equals(existing.getDuration(), subtask.getDuration())
                 )
                 .findFirst()
                 .orElse(null);
@@ -272,6 +289,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         int id = getCurrentTaskCount();
         subtask.setId(id);
+        addPrioritizedTask(subtask);
         subtasks.put(id, subtask);
 
         int epicId = subtask.getEpicId();
@@ -294,6 +312,7 @@ public class InMemoryTaskManager implements TaskManager {
                 .map(subtasks::remove)
                 .filter(Objects::nonNull)
                 .forEach(subtask -> {
+                    removeTaskFromPrioritized(subtask);
                     int epicId = subtask.getEpicId();
                     Epic epic = epics.get(epicId);
 
@@ -309,6 +328,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeSubtaskById(int id) {
         Subtask subtask = subtasks.remove(id);
+        removeTaskFromPrioritized(subtask);
 
         if (subtask != null) {
             int epicId = subtask.getEpicId();
@@ -319,9 +339,9 @@ public class InMemoryTaskManager implements TaskManager {
                 epic.removeSubtask(subtask);
                 updateEpic(epic);
 
-                    if (!oldStatus.equals(epic.getStatus())) {
-                        epics.put(epic.getId(), epic);
-                    }
+                if (!oldStatus.equals(epic.getStatus())) {
+                    epics.put(epic.getId(), epic);
+                }
             }
         }
     }
@@ -339,6 +359,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         updatedSubtask.setId(updateSubtaskId);
 
+        updatePrioritizedTask(updatedSubtask);
         subtasks.put(updateSubtaskId, updatedSubtask);
         epic.addSubtask(updatedSubtask);
         updateEpic(epic);
@@ -346,63 +367,87 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getPrioritizedTasks() {
-        return Stream.of(
-                        getAllTasks(),
-                        getAllSubtasks(),
-                        getAllEpics()
-                )
-                .flatMap(List::stream)
-                .filter(task -> task.getStartTime() != null)
-                .sorted(Comparator.comparing(
-                        Task::getStartTime,
-                        Comparator.nullsLast(Comparator.naturalOrder())
-                ))
-                .collect(Collectors.toList());
+        return new ArrayList<>(prioritizedTasks);
     }
 
-    private boolean isTimeConflict(Task task1, Task task2) { // вернет true если пересекаются
+    //    private boolean isTimeConflict(Task task1, Task task2) {
+//        if (task1.getStartTime() == null || task1.getEndTime() == null ||
+//                task2.getStartTime() == null || task2.getEndTime() == null) {
+//            return false; // задачи без времени не пересекаются
+//        }
+//        return task1.getStartTime().isBefore(task2.getEndTime()) &&
+//                task2.getStartTime().isBefore(task1.getEndTime());
+//    }
+//
+//    public boolean checkForConflicts(Task newTask) {
+//        if (newTask.getStartTime() == null || newTask.getEndTime() == null) {
+//            return false; // задача без времени не конфликтует
+//        }
+//
+//        // Проверяем пересечение с обычными задачами
+//        for (Task task : getAllTasks()) {
+//            if (task.getId() != newTask.getId() && isTimeConflict(task, newTask)) {
+//                return true;
+//            }
+//        }
+//
+//        // Проверяем пересечение с подзадачами
+//        for (Subtask subtask : getAllSubtasks()) {
+//            if (subtask.getId() != newTask.getId() && isTimeConflict(subtask, newTask)) {
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//    }
+    private boolean isTimeConflict(Task task1, Task task2) {
         if (task1.getStartTime() == null || task2.getStartTime() == null) {
             return false;
         }
         LocalDateTime end1 = task1.getEndTime();
         LocalDateTime end2 = task2.getEndTime();
+
         return !end1.isBefore(task2.getStartTime()) && !end2.isBefore(task1.getStartTime());
     }
 
-    private boolean checkForConflicts(Task newTask) { // Метод вернет true, если есть хотя бы один конфликт
+    private boolean checkForConflicts(Task newTask) {
         if (newTask.getStartTime() == null || newTask.getEndTime() == null) {
             return false;
         }
 
-        return Stream.concat(
-                        getAllTasks().stream(),
-                        getAllSubtasks().stream()
-                )
+        return getPrioritizedTasks()
+                .stream()
                 .anyMatch(task -> isTimeConflict(task, newTask));
     }
 
-//    private void removeTaskFromPrioritized(Task task) {
-//        prioritizedTasks.remove(task);
-//    }
+    private void addPrioritizedTask(Task task) {
+        if (task.getStartTime() != null) {
+            prioritizedTasks.add(task);
+        }
+    }
 
-//    private void updatePrioritizedTask(Task task) {
-//        if (task == null) {
-//            throw new IllegalArgumentException("Задача не может быть null");
-//        }
-//
-//        TreeSet<Task> tempTasks = new TreeSet<>(prioritizedTasks);
-//
-//        tempTasks.stream()
-//                .filter(existingTask ->
-//                        existingTask.getTitle().equals(task.getTitle()) &&
-//                                existingTask.getDescription().equals(task.getDescription())
-//                )
-//                .forEach(existingTask -> removeTaskFromPrioritized(existingTask));
-//
-//        if (checkForConflicts(task)) {
-//            throw new ManagerSaveException("Подзадача пересекается по времени с существующими задачами");
-//        }
-//        addPrioritizedTask(task);
-//    }
+    private void removeTaskFromPrioritized(Task task) {
+        prioritizedTasks.remove(task);
+    }
+
+    private void updatePrioritizedTask(Task task) {
+        if (task == null) {
+            throw new IllegalArgumentException("Задача не может быть null");
+        }
+
+        TreeSet<Task> tempTasks = new TreeSet<>(prioritizedTasks);
+
+        tempTasks.stream()
+                .filter(existingTask ->
+                        existingTask.getTitle().equals(task.getTitle()) &&
+                                existingTask.getDescription().equals(task.getDescription())
+                )
+                .forEach(this::removeTaskFromPrioritized);
+
+        if (checkForConflicts(task)) {
+            throw new ManagerSaveException("Подзадача пересекается по времени с существующими задачами");
+        }
+        addPrioritizedTask(task);
+    }
 
 }

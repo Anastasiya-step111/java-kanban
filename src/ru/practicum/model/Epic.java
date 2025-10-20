@@ -22,6 +22,7 @@ public class Epic extends Task {
         if (subtasks.isEmpty()) {
             return null;
         }
+        
         return subtasks.stream()
                 .map(Subtask::getStartTime)
                 .filter(Objects::nonNull)
