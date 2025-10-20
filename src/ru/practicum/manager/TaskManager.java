@@ -5,7 +5,6 @@ import ru.practicum.model.Subtask;
 import ru.practicum.model.Task;
 
 import java.util.List;
-import java.util.TreeSet;
 
 public interface TaskManager {
 
