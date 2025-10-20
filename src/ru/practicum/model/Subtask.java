@@ -80,7 +80,7 @@ public class Subtask extends Task {
     public String toCSVStr() {
         String startTimeStr = (getStartTime() != null) ? getStartTime().toString() : "";
         String durationStr = (getDuration() != null) ? String.valueOf(getDuration().toMinutes()) : "";
-        return String.format("%d,%s,%s,%s,%s,%d", getId(), getType(), getTitle(), getStatus(), getDescription(),
+        return String.format("%d,%s,%s,%s,%s,%s,%s,%d", getId(), getType(), getTitle(), getStatus(), getDescription(),
                 startTimeStr, durationStr, getEpicId());
     }
 }
