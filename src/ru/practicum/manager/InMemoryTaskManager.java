@@ -220,11 +220,11 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic != null && epic.getSubtasks() != null) {
 
             epic.getSubtasks()
+                    .stream()
+                    .filter(Objects::nonNull) // Фильтруем null значения
                     .forEach(subtask -> {
-                        if (subtask != null) {
-                            subtasks.remove(subtask.getId());
-                            removeTaskFromPrioritized(subtask);
-                        }
+                        subtasks.remove(subtask.getId());
+                        removeTaskFromPrioritized(subtask);
                     });
         }
     }
@@ -269,14 +269,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask createSubtask(Subtask subtask) {
+    public Subtask createSubtask(Subtask newSubtask) {
         Subtask existingSubtask = subtasks.values().stream()
-                .filter(existing ->
-                        Objects.equals(existing.getTitle(), subtask.getTitle()) &&
-                                Objects.equals(existing.getDescription(), subtask.getDescription()) &&
-                                existing.getEpicId() == subtask.getEpicId() &&
-                                Objects.equals(existing.getStartTime(), subtask.getStartTime()) &&
-                                Objects.equals(existing.getDuration(), subtask.getDuration())
+                .filter(subtask ->
+                        Objects.equals(subtask.getTitle(), newSubtask.getTitle()) &&
+                                Objects.equals(subtask.getDescription(), newSubtask.getDescription()) &&
+                                subtask.getEpicId() == newSubtask.getEpicId() &&
+                                Objects.equals(subtask.getStartTime(), newSubtask.getStartTime()) &&
+                                Objects.equals(subtask.getDuration(), newSubtask.getDuration())
                 )
                 .findFirst()
                 .orElse(null);
@@ -284,23 +284,23 @@ public class InMemoryTaskManager implements TaskManager {
         if (existingSubtask != null) {
             return existingSubtask;
         }
-        if (checkForConflicts(subtask)) {
+        if (checkForConflicts(newSubtask)) {
             throw new ManagerSaveException("Подзадача пересекается по времени с существующими задачами");
         }
         int id = getCurrentTaskCount();
-        subtask.setId(id);
-        addPrioritizedTask(subtask);
-        subtasks.put(id, subtask);
+        newSubtask.setId(id);
+        addPrioritizedTask(newSubtask);
+        subtasks.put(id, newSubtask);
 
-        int epicId = subtask.getEpicId();
+        int epicId = newSubtask.getEpicId();
         Epic epic = epics.get(epicId);
 
         if (epic != null) {
-            epic.addSubtask(subtask);
+            epic.addSubtask(newSubtask);
             updateEpic(epic);
         }
 
-        return subtask;
+        return newSubtask;
     }
 
 
@@ -370,36 +370,6 @@ public class InMemoryTaskManager implements TaskManager {
         return new ArrayList<>(prioritizedTasks);
     }
 
-    //    private boolean isTimeConflict(Task task1, Task task2) {
-//        if (task1.getStartTime() == null || task1.getEndTime() == null ||
-//                task2.getStartTime() == null || task2.getEndTime() == null) {
-//            return false; // задачи без времени не пересекаются
-//        }
-//        return task1.getStartTime().isBefore(task2.getEndTime()) &&
-//                task2.getStartTime().isBefore(task1.getEndTime());
-//    }
-//
-//    public boolean checkForConflicts(Task newTask) {
-//        if (newTask.getStartTime() == null || newTask.getEndTime() == null) {
-//            return false; // задача без времени не конфликтует
-//        }
-//
-//        // Проверяем пересечение с обычными задачами
-//        for (Task task : getAllTasks()) {
-//            if (task.getId() != newTask.getId() && isTimeConflict(task, newTask)) {
-//                return true;
-//            }
-//        }
-//
-//        // Проверяем пересечение с подзадачами
-//        for (Subtask subtask : getAllSubtasks()) {
-//            if (subtask.getId() != newTask.getId() && isTimeConflict(subtask, newTask)) {
-//                return true;
-//            }
-//        }
-//
-//        return false;
-//    }
     private boolean isTimeConflict(Task task1, Task task2) {
         if (task1.getStartTime() == null || task2.getStartTime() == null) {
             return false;
