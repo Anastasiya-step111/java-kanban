@@ -96,8 +96,15 @@ public class InMemoryTaskManager implements TaskManager {
         if (existingTask.isPresent()) {
             return existingTask.get();
         }
-        if (checkForConflicts(task)) {
-            throw new ManagerSaveException("Подзадача пересекается по времени с существующими задачами");
+        Task conflictingTask = findConflictingTask(task);
+        if (conflictingTask != null) {
+            String conflictMessage = String.format(
+                    "Подзадача пересекается по времени с существующей задачей: %s (%s - %s)",
+                    conflictingTask.getTitle(),
+                    conflictingTask.getStartTime(),
+                    conflictingTask.getEndTime()
+            );
+            throw new ManagerSaveException(conflictMessage);
         }
         int id = getCurrentTaskCount();
         task.setId(id);
@@ -284,8 +291,15 @@ public class InMemoryTaskManager implements TaskManager {
         if (existingSubtask != null) {
             return existingSubtask;
         }
-        if (checkForConflicts(newSubtask)) {
-            throw new ManagerSaveException("Подзадача пересекается по времени с существующими задачами");
+        Task conflictingTask = findConflictingTask(newSubtask);
+        if (conflictingTask != null) {
+            String conflictMessage = String.format(
+                    "Подзадача пересекается по времени с существующей задачей: %s (%s - %s)",
+                    conflictingTask.getTitle(),
+                    conflictingTask.getStartTime(),
+                    conflictingTask.getEndTime()
+            );
+            throw new ManagerSaveException(conflictMessage);
         }
         int id = getCurrentTaskCount();
         newSubtask.setId(id);
@@ -380,14 +394,16 @@ public class InMemoryTaskManager implements TaskManager {
         return !end1.isBefore(task2.getStartTime()) && !end2.isBefore(task1.getStartTime());
     }
 
-    private boolean checkForConflicts(Task newTask) {
+    private Task findConflictingTask(Task newTask) {
         if (newTask.getStartTime() == null || newTask.getEndTime() == null) {
-            return false;
+            return null;
         }
 
         return getPrioritizedTasks()
                 .stream()
-                .anyMatch(task -> isTimeConflict(task, newTask));
+                .filter(task -> isTimeConflict(task, newTask))
+                .findFirst()
+                .orElse(null);
     }
 
     private void addPrioritizedTask(Task task) {
@@ -414,8 +430,15 @@ public class InMemoryTaskManager implements TaskManager {
                 )
                 .forEach(this::removeTaskFromPrioritized);
 
-        if (checkForConflicts(task)) {
-            throw new ManagerSaveException("Подзадача пересекается по времени с существующими задачами");
+        Task conflictingTask = findConflictingTask(task);
+        if (conflictingTask != null) {
+            String conflictMessage = String.format(
+                    "Подзадача пересекается по времени с существующей задачей: %s (%s - %s)",
+                    conflictingTask.getTitle(),
+                    conflictingTask.getStartTime(),
+                    conflictingTask.getEndTime()
+            );
+            throw new ManagerSaveException(conflictMessage);
         }
         addPrioritizedTask(task);
     }
