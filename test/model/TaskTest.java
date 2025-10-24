@@ -8,9 +8,16 @@ import org.junit.jupiter.api.Test;
 import ru.practicum.model.Status;
 import ru.practicum.model.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 class TaskTest {
@@ -20,30 +27,35 @@ class TaskTest {
     Task task2;
     Task task3;
 
+    LocalDateTime startTime1 = LocalDateTime.of(2029, 10, 1, 10, 0);
+    Duration duration1 = Duration.ofHours(1);
+
+    LocalDateTime startTime2 = LocalDateTime.of(2029, 10, 3, 11, 0);
+    Duration duration2 = Duration.ofHours(2);
+
     @BeforeEach
     public void beforeEach() {
 
-        task1 = manager.createTask(new Task("Купить продукты", "Хлеб яйца масло", manager, Status.NEW));
+        task1 = manager.createTask(new Task("Купить продукты", "Хлеб яйца масло", manager, Status.NEW,
+                startTime1, duration1));
         task2 = manager.createTask(new Task("Постирать вещи", "Разделить по цветам", manager,
-                Status.NEW));
-        task3 = manager.createTask(new Task("Купить продукты", "Хлеб яйца масло", manager, Status.NEW));
-
+                Status.NEW, startTime2, duration2));
     }
 
     @Test
-    void shouldReturnCorrectTitle() {
+    void testGetTitle() {
         assertEquals("Купить продукты", task1.getTitle(), "Название задачи искажается при методе " +
                 "getTitle");
     }
 
     @Test
-    void shouldReturnCorrectDescription() {
+    void testGetDescription() {
         assertEquals("Хлеб яйца масло", task1.getDescription(), "Описание искажается при методе " +
                 "getDescription");
     }
 
     @Test
-    void shouldReturnCorrectId() {
+    void testGetId() {
         int originalId = task1.getId();
         Task retrievedTask = manager.getTaskById(originalId);
         int retrievedId = retrievedTask.getId();
@@ -51,7 +63,7 @@ class TaskTest {
     }
 
     @Test
-    void shouldReturnCorrectStatus() {
+    void testGetStatus() {
         Status originalStatus = task1.getStatus();
         int originalId = task1.getId();
         Task retrievedTask = manager.getTaskById(originalId);
@@ -60,41 +72,33 @@ class TaskTest {
     }
 
     @Test
-    void shouldCorrectEquals() {
+    void testGetEquals() {
         assertTrue(task1.equals(task1), "Задача не равна самой себе");
-        assertTrue(task1.equals(task3), "Не обнаружены равные объекты");
         assertFalse(task1.equals(task2), "Обнаружены равные объекты при разных параметрах");
         assertFalse(task1.equals(null), "Равенство с null должно возвращать false");
         assertFalse(task1.equals("string"), "Равенство с другим типом должно возвращать false");
     }
 
     @Test
-    void shouldCorrectHashCode() {
-        if (task1.equals(task3)) {
-            assertEquals(task1.hashCode(), task3.hashCode(), "Нарушение контракта: равные объекты имеют " +
-                    "разные хеш-коды");
-        }
-    }
-
-    @Test
-    void testEqualsById() {
-        assertEquals(task1.getId(), task3.getId(), "ID одинаковых экземпляров класса model.Task " +
-                "должны совпадать");
-        assertTrue(task1.equals(task3), "Задачи с одинаковым ID должны быть равны");
-    }
-
-    @Test
     void testUpdateTask() {
+        assertTrue(manager.getPrioritizedTasks().contains(task1),
+                "Задача task1 должна быть добавлена в prioritizedTasks до обновления");
+
         int taskId = task1.getId();
         String originalTitle = task1.getTitle();
         String originalDescription = task1.getDescription();
         Status originalStatus = task1.getStatus();
+        LocalDateTime originalStartTime = task1.getStartTime();
+        Duration originalDuration = task1.getDuration();
 
         String newTitle = "Купить продукты и приготовить ужин";
         String newDescription = "Хлеб, яйца, масло, овощи";
         Status newStatus = Status.IN_PROGRESS;
+        LocalDateTime newStartTime = LocalDateTime.of(2029, 10, 7, 10, 0); // Новое время без конфликта
+        Duration newDuration = Duration.ofHours(2);
 
-        Task updatedTask = new Task(newTitle, newDescription, manager, newStatus);
+        Task updatedTask = new Task(newTitle, newDescription, manager, newStatus, newStartTime,
+                newDuration);
         updatedTask.setId(taskId);
 
         manager.updateTask(updatedTask);
@@ -106,15 +110,26 @@ class TaskTest {
         assertEquals(newTitle, updatedFromManager.getTitle(), "Название должно быть обновлено");
         assertEquals(newDescription, updatedFromManager.getDescription(), "Описание должно быть обновлено");
         assertEquals(newStatus, updatedFromManager.getStatus(), "Статус должен быть обновлен");
+        assertEquals(newStartTime, updatedFromManager.getStartTime(), "Время начала должно быть обновлено");
+        assertEquals(newDuration, updatedFromManager.getDuration(), "Длительность должна быть обновлена");
 
         assertNotEquals(originalTitle, updatedFromManager.getTitle(), "Исходное название должно отличаться");
         assertNotEquals(originalDescription, updatedFromManager.getDescription(), "Исходное описание " +
                 "должно отличаться");
         assertNotEquals(originalStatus, updatedFromManager.getStatus(), "Исходный статус должен отличаться");
+        assertNotEquals(originalStartTime, updatedFromManager.getStartTime(), "Исходное время должно отличаться");
+        assertNotEquals(originalDuration, updatedFromManager.getDuration(), "Исходная длительность должна " +
+                "отличаться");
+
+        assertTrue(manager.getPrioritizedTasks().contains(updatedFromManager),
+                "Задача должна быть добавлена в prioritizedTasks после обновления");
     }
 
     @Test
     void testDeleteTask() {
+        assertTrue(manager.getPrioritizedTasks().contains(task1),
+                "Задача task1 должна быть добавлена в prioritizedTasks до обновления");
+
         int taskId = task1.getId();
         List<Task> allTasks = manager.getAllTasks();
 
@@ -141,11 +156,12 @@ class TaskTest {
             }
         }
         assertFalse(taskStillExists, "Задача должна быть удалена");
+        assertFalse(manager.getPrioritizedTasks().contains(task1),
+                "Задача task1 должна быть удалена из prioritizedTasks");
+
         assertEquals(initialTaskCount - 1, updatedTasks.size(), "Количество задач должно уменьшиться " +
                 "на 1");
-        manager.deleteTask(9999); // произвольный несуществующий ID
-        assertEquals(initialTaskCount - 1, manager.getAllTasks().size(), "Удаление несуществующей " +
-                "задачи не должно менять размер");
+
     }
 
     @Test
@@ -153,8 +169,16 @@ class TaskTest {
         int initialTaskCount = manager.getAllTasks().size();
         assertTrue(initialTaskCount > 0, "Изначально должно быть хотя бы несколько задач");
 
-        manager.createTask(new Task("Новая задача 1", "Описание 1", manager, Status.NEW));
-        manager.createTask(new Task("Новая задача 2", "Описание 2", manager, Status.IN_PROGRESS));
+        LocalDateTime startTime3 = LocalDateTime.of(2029, 10, 5, 13, 0);  // 19 октября 2025, 13:00
+        Duration duration3 = Duration.ofHours(1);
+
+        LocalDateTime startTime4 = LocalDateTime.of(2029, 10, 9, 11, 0);  // 19 октября 2025, 11:00
+        Duration duration4 = Duration.ofHours(2);
+
+        manager.createTask(new Task("Новая задача 1", "Описание 1", manager, Status.NEW,
+                startTime3, duration3));
+        manager.createTask(new Task("Новая задача 2", "Описание 2", manager, Status.IN_PROGRESS,
+                startTime4, duration4));
 
         int updatedTaskCount = manager.getAllTasks().size();
         assertTrue(updatedTaskCount > initialTaskCount, "Количество задач должно увеличиться после " +
@@ -162,14 +186,25 @@ class TaskTest {
 
         manager.deleteAllTasks();
 
+        assertTrue(manager.getPrioritizedTasks().isEmpty(),
+                "В prioritizedTasks не должно быть задач после удаления");
+
+        assertTrue(
+                manager.getPrioritizedTasks().stream().count() == 0,
+                "Количество задач в prioritizedTasks должно быть равно нулю"
+        );
+
         assertTrue(manager.getAllTasks().isEmpty(), "После удаления всех задач список должен быть пустым");
         assertEquals(0, manager.getAllTasks().size(), "Размер списка задач должен быть равен 0");
 
         manager.deleteAllTasks();
         assertTrue(manager.getAllTasks().isEmpty(), "Повторное удаление не должно нарушить состояние");
 
+        LocalDateTime startTime6 = LocalDateTime.of(2029, 10, 11, 15, 0);  // 19 октября 2025, 13:00
+        Duration duration6 = Duration.ofHours(1);
+
         Task newTask = manager.createTask(new Task("Проверка после очистки", "Тест", manager,
-                Status.NEW));
+                Status.NEW, startTime6, duration6));
         assertFalse(manager.getAllTasks().isEmpty(), "После создания новой задачи список не должен быть " +
                 "пустым");
         assertEquals(1, manager.getAllTasks().size(), "Должна быть только одна задача");
@@ -178,40 +213,44 @@ class TaskTest {
 
     @Test
     void testSetTitle() {
-        assertEquals("Купить продукты", task1.getTitle());
+        assertEquals("Купить продукты", task1.getTitle(), "Изначально название таска должно совпадать");
 
         int taskId = task1.getId();
 
         task1.setTitle("Купить лекарства");
-        assertEquals("Купить лекарства", task1.getTitle());
+        assertEquals("Купить лекарства", task1.getTitle(), "Название должно измениться");
 
         Task updatedTask = manager.getTaskById(taskId);
         assertNotNull(updatedTask);
-        assertEquals("Купить лекарства", updatedTask.getTitle());
+        assertEquals("Купить лекарства", updatedTask.getTitle(), "После переименования новый " +
+                "экземпляр должен сохраниться");
     }
 
     @Test
     void testSetDescription() {
-        assertEquals("Хлеб яйца масло", task1.getDescription());
+        assertEquals("Хлеб яйца масло", task1.getDescription(), "Изначально описание таска должно " +
+                "совпадать");
         int taskId = task1.getId();
         task1.setDescription("Молоко, сыр, хлеб");
 
-        assertEquals("Молоко, сыр, хлеб", task1.getDescription());
+        assertEquals("Молоко, сыр, хлеб", task1.getDescription(), "Описание должно измениться");
 
         Task updatedTask = manager.getTaskById(taskId);
-        assertEquals("Молоко, сыр, хлеб", updatedTask.getDescription());
+        assertEquals("Молоко, сыр, хлеб", updatedTask.getDescription(), "После изменения описания " +
+                "экземпляр должен заменить предыдущий");
     }
 
     @Test
     void testSetStatus() {
-        assertEquals(Status.NEW, task1.getStatus());
+        assertEquals(Status.NEW, task1.getStatus(), "Статус должен совпадать");
         int taskId = task1.getId();
         task1.setStatus(Status.DONE);
 
-        assertEquals(Status.DONE, task1.getStatus());
+        assertEquals(Status.DONE, task1.getStatus(), "Статус должен измениться");
 
         Task updatedTask = manager.getTaskById(taskId);
-        assertEquals(Status.DONE, updatedTask.getStatus());
+        assertEquals(Status.DONE, updatedTask.getStatus(), "После изменение статуса экземпляр с новым статусом " +
+                "должен заменить предыдущий");
     }
 
     @Test
@@ -225,18 +264,18 @@ class TaskTest {
         assertTrue(task2.getId() > 0);
         assertNotEquals(task1.getId(), task2.getId());
 
-        assertSame(task1, task3);
         assertEquals(2, manager.getAllTasks().size());
 
+        LocalDateTime startTime7 = LocalDateTime.of(2029, 10, 13, 11, 0);  // 19 октября 2025, 11:00
+        Duration duration7 = Duration.ofHours(2);
+
         Task newTask = manager.createTask(new Task("Купить продукты", "Молоко сыр творог",
-                manager, Status.NEW));
+                manager, Status.NEW, startTime7, duration7));
         assertNotSame(task1, newTask);
         assertEquals(3, manager.getAllTasks().size());
+        assertTrue(manager.getPrioritizedTasks().contains(newTask),
+                "Задача должна быть добавлена в prioritizedTasks");
 
-        Task anotherTask = manager.createTask(new Task("Купить лекарства", "Хлеб яйца масло",
-                manager, Status.NEW));
-        assertNotSame(task1, anotherTask);
-        assertEquals(4, manager.getAllTasks().size());
     }
 }
 

@@ -2,8 +2,16 @@ package ru.practicum.manager;
 
 import ru.practicum.model.*;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,33 +123,58 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
-            writer.write("id,type,name,status,description,epic\n");
+            writer.write("id,type,title,status,description,startTime,duration,epic\n");
 
-            for (Task task : getAllTasks()) {
-                writer.write(task.toCSVStr() + "\n");
-            }
-            for (Subtask subtask : getAllSubtasks()) {
-                writer.write(subtask.toCSVStr() + "\n");
-            }
-            for (Epic epic : getAllEpics()) {
-                writer.write(epic.toCSVStr() + "\n");
-            }
+            getAllTasks().stream()
+                    .map(Task::toCSVStr)
+                    .forEach(line -> {
+                        try {
+                            writer.write(line + "\n");
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
 
+            getAllSubtasks().stream()
+                    .map(Subtask::toCSVStr)
+                    .forEach(line -> {
+                        try {
+                            writer.write(line + "\n");
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+
+            getAllEpics().stream()
+                    .map(Epic::toCSVStr)
+                    .forEach(line -> {
+                        try {
+                            writer.write(line + "\n");
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
 
             List<Task> history = getHistory();
             if (!history.isEmpty()) {
                 writer.write("\nHISTORY:\n");
-                for (Task task : history) {
-                    writer.write(task.getId() + "\n");
-                }
+                history.stream()
+                        .map(Task::getId)
+                        .map(String::valueOf)
+                        .forEach(line -> {
+                            try {
+                                writer.write(line + "\n");
+                            } catch (IOException e) {
+                                throw new UncheckedIOException(e);
+                            }
+                        });
             }
-
         } catch (IOException e) {
             throw new ManagerSaveException("Не удалось сохранить данные в файл", e);
         }
     }
 
-    private void loadFromFile(File file) {
+    public void loadFromFile(File file) {
         if (!file.exists()) {
             return;
         }
@@ -149,7 +182,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
             String line;
             boolean isHeaderRead = false;
-            List<String> historyIds = new ArrayList<>();
+            List<Integer> historyIds = new ArrayList<>();
 
             while ((line = reader.readLine()) != null) {
                 if (!isHeaderRead) {
@@ -167,7 +200,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
                         try {
                             int id = Integer.parseInt(line.trim());
-                            historyIds.add(String.valueOf(id));
+                            //historyIds.add(String.valueOf(id));
                         } catch (NumberFormatException e) {
                             System.err.println("Некорректный ID в истории: " + line);
                         }
@@ -207,20 +240,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String title = parts[2];
         Status status = Status.valueOf(parts[3]);
         String description = parts[4];
+        LocalDateTime startTime = parts[5].isEmpty() ? null : LocalDateTime.parse(parts[5]);
+        Duration duration = parts[6].isEmpty() ? null : Duration.ofMinutes(Long.parseLong(parts[6]));
 
-        Task task = new Task(title, description, this, status);
+        Task task = new Task(title, description, this, status, startTime, duration);
         task.setId(id);
         createTask(task);
     }
 
     private void addSubtaskFromCSV(String[] parts) {
         int id = Integer.parseInt(parts[0]);
-        int epicId = Integer.parseInt(parts[5]);
         String title = parts[2];
         Status status = Status.valueOf(parts[3]);
         String description = parts[4];
+        LocalDateTime startTime = parts[5].isEmpty() ? null : LocalDateTime.parse(parts[5]);
+        Duration duration = parts[6].isEmpty() ? null : Duration.ofMinutes(Long.parseLong(parts[6]));
+        int epicId = Integer.parseInt(parts[7]);
 
-        Subtask subtask = new Subtask(title, description, this, epicId, status);
+        Subtask subtask = new Subtask(title, description, this, epicId, status, startTime, duration);
         subtask.setId(id);
         createSubtask(subtask);
     }
@@ -230,22 +267,31 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String title = parts[2];
         Status status = Status.valueOf(parts[3]);
         String description = parts[4];
+        LocalDateTime startTime = parts[5].isEmpty() ? null : LocalDateTime.parse(parts[5]);
+        Duration duration = parts[6].isEmpty() ? null : Duration.ofMinutes(Long.parseLong(parts[6]));
 
         Epic epic = new Epic(title, description, this, status);
         epic.setId(id);
+        epic.setStartTime(startTime);
+        epic.setDuration(duration);
         createEpic(epic);
     }
 
-    private void restoreHistory(List<String> historyIds) {
-        for (String idStr : historyIds) {
-            try {
-                int id = Integer.parseInt(idStr);
-                Task task = getTaskById(id);
-                if (task != null) {
-                    historyManager.add(task);
-                }
-            } catch (NumberFormatException e) {
-                System.err.println("Ошибка восстановления истории: " + idStr);
+    private void restoreHistory(List<Integer> historyIds) {
+        for (int id : historyIds) {
+            Task task = tasks.get(id);
+            if (task != null) {
+                historyManager.add(task);
+                continue;
+            }
+            Epic epic = epics.get(id);
+            if (epic != null) {
+                historyManager.add(epic);
+                continue;
+            }
+            Subtask subtask = subtasks.get(id);
+            if (subtask != null) {
+                historyManager.add(subtask);
             }
         }
     }
