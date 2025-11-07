@@ -65,6 +65,7 @@ public class EpicHandler extends BaseHttpHandler {
                     }
 
                     sendResponse(exchange, "{\"error\":\"Not found\"}", 404);
+                    return;
                 }
 
                 case POST -> {
@@ -92,6 +93,7 @@ public class EpicHandler extends BaseHttpHandler {
                     }
 
                     sendResponse(exchange, "{\"error\":\"Not found\"}", 404);
+                    return;
                 }
 
                 case DELETE -> {
@@ -114,6 +116,7 @@ public class EpicHandler extends BaseHttpHandler {
                     }
 
                     sendResponse(exchange, "{\"error\":\"Not found\"}", 404);
+                    return;
                 }
 
                 default -> sendResponse(exchange, "{\"error\":\"Method not allowed\"}", 405);

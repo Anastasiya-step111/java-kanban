@@ -44,7 +44,6 @@ public class TaskHandler extends BaseHttpHandler {
                     }
 
                     sendResponse(exchange, "{\"error\":\"Not found\"}", 404);
-                    return;
                 }
 
                 case "POST" -> {
@@ -62,7 +61,6 @@ public class TaskHandler extends BaseHttpHandler {
                     }
 
                     sendResponse(exchange, "{\"error\":\"Not found\"}", 404);
-                    return;
                 }
 
                 case "DELETE" -> {
@@ -83,6 +81,7 @@ public class TaskHandler extends BaseHttpHandler {
                         exchange.close();
                         return;
                     }
+                    sendResponse(exchange, "{\"error\":\"Not found\"}", 404);
                 }
 
                 default -> sendResponse(exchange, "{\"error\":\"Method not allowed\"}", 405);
