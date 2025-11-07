@@ -350,7 +350,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void removeSubtaskById(int id) {
+    public boolean removeSubtaskById(int id) {
         Subtask subtask = subtasks.remove(id);
         removeTaskFromPrioritized(subtask);
 
@@ -367,11 +367,18 @@ public class InMemoryTaskManager implements TaskManager {
                     epics.put(epic.getId(), epic);
                 }
             }
+            return true;
+        } else {
+            return false;
         }
     }
 
     @Override
-    public void updateSubtask(Subtask updatedSubtask, int updateSubtaskId) {
+    public boolean updateSubtask(Subtask updatedSubtask, int updateSubtaskId) {
+        if(updatedSubtask == null) {
+            return false;
+        }
+
         int epicId = updatedSubtask.getEpicId();
         Epic epic = epics.get(epicId);
 
@@ -387,6 +394,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks.put(updateSubtaskId, updatedSubtask);
         epic.addSubtask(updatedSubtask);
         updateEpic(epic);
+        return true;
     }
 
     @Override
