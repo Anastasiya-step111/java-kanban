@@ -205,7 +205,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
                         try {
                             int id = Integer.parseInt(line.trim());
-                            //historyIds.add(String.valueOf(id));
+                            historyIds.add(id);
                         } catch (NumberFormatException e) {
                             System.err.println("Некорректный ID в истории: " + line);
                         }

@@ -128,7 +128,7 @@ public class InMemoryTaskManager implements TaskManager {
     public boolean deleteTask(int id) {
         Task removed = tasks.remove(id);
         if (removed != null) {
-            removeTaskFromPrioritized(getTaskById(id));
+            removeTaskFromPrioritized(removed);
             return true;
         }
         return false;
@@ -141,7 +141,6 @@ public class InMemoryTaskManager implements TaskManager {
         taskList.stream()
                 .forEach(task -> {
                     removeTaskFromPrioritized(task);
-                    deleteTask(task.getId());
                 });
 
         tasks.clear();
