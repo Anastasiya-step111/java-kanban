@@ -20,7 +20,7 @@ public interface TaskManager {
 
         void updateTask(Task task);
 
-        void deleteTask(int id);
+        boolean deleteTask(int id);
 
         void deleteAllTasks();
 
