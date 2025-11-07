@@ -38,7 +38,7 @@ public abstract class BaseHttpHandler implements com.sun.net.httpserver.HttpHand
         sendResponse(h, "{\"error\":\"Not found\"}", 404);
     }
 
-    protected void sendHasInteractions(HttpExchange h) throws IOException {
+    protected void sendHasOverlaps(HttpExchange h) throws IOException {
         sendResponse(h, "{\"error\":\"Task intersects with existing tasks\"}", 406);
     }
 

@@ -58,7 +58,7 @@ public class SubtaskHandler extends BaseHttpHandler {
                             sendResponse(exchange, GSON.toJson(Map.of("id", id)), 201);
                             return;
                         } catch (ManagerSaveException e) {
-                            sendHasInteractions(exchange);
+                            sendHasOverlaps(exchange);
                             return;
                         }
                     }
@@ -75,7 +75,7 @@ public class SubtaskHandler extends BaseHttpHandler {
                                 if (taskManager.getSubtaskById(id) == null) {
                                     sendNotFound(exchange);
                                 } else {
-                                    sendHasInteractions(exchange);
+                                    sendHasOverlaps(exchange);
                                 }
                                 return;
                             }
@@ -84,7 +84,7 @@ public class SubtaskHandler extends BaseHttpHandler {
                             exchange.close();
                             return;
                         } catch (ManagerSaveException e) {
-                            sendHasInteractions(exchange);
+                            sendHasOverlaps(exchange);
                             return;
                         }
                     }

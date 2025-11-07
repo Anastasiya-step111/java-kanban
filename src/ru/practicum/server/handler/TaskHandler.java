@@ -58,7 +58,7 @@ public class TaskHandler extends BaseHttpHandler {
                         sendResponse(exchange, GSON.toJson(Map.of("id", id)), 201);
                         return;
                     } catch (ManagerSaveException e) {
-                        sendHasInteractions(exchange);
+                        sendHasOverlaps(exchange);
                         return;
                     }
                 }
