@@ -1,12 +1,12 @@
 package ru.practicum.server.handler;
 
 import com.sun.net.httpserver.HttpExchange;
-import ru.practicum.manager.TaskManager;
+import ru.practicum.manager.*;
 import ru.practicum.model.Task;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+import java.util.*;
 import java.util.regex.*;
 
 public class TaskHandler extends BaseHttpHandler {
@@ -47,20 +47,18 @@ public class TaskHandler extends BaseHttpHandler {
                 }
 
                 case "POST" -> {
-                    if ("/tasks".equals(path)) {
+                    try {
                         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
                         Task newTask = GSON.fromJson(body, Task.class);
                         Task task = taskManager.createTask(newTask);
                         int id = task.getId();
-                        if (id == -1) {
-                            sendHasInteractions(exchange);
-                            return;
-                        }
-                        sendResponse(exchange, "{\"id\":" + id + "}", 201);
+
+                        sendResponse(exchange, GSON.toJson(Map.of("id", id)), 201);
+                        return;
+                    } catch (ManagerSaveException e) {
+                        sendHasInteractions(exchange);
                         return;
                     }
-
-                    sendResponse(exchange, "{\"error\":\"Not found\"}", 404);
                 }
 
                 case "DELETE" -> {
