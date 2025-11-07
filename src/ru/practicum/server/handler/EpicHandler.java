@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class EpicHandler extends HttpHandler {
+public class EpicHandler extends BaseHttpHandler {
     private final TaskManager taskManager;
 
     public EpicHandler(TaskManager taskManager) {

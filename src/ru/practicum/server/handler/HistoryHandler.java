@@ -7,7 +7,7 @@ import ru.practicum.model.Task;
 import java.io.IOException;
 import java.util.List;
 
-public class HistoryHandler extends HttpHandler {
+public class HistoryHandler extends BaseHttpHandler {
     private final TaskManager taskManager;
 
     public HistoryHandler(TaskManager taskManager) {

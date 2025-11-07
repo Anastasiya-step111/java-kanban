@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class TaskHandler extends HttpHandler {
+public class TaskHandler extends BaseHttpHandler {
     private final TaskManager taskManager;
 
     public TaskHandler(TaskManager taskManager) {

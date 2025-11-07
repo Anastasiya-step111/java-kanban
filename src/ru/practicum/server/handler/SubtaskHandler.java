@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-public class SubtaskHandler extends HttpHandler {
+public class SubtaskHandler extends BaseHttpHandler {
     private final TaskManager taskManager;
 
     public SubtaskHandler(TaskManager taskManager) {
