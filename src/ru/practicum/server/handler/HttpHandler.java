@@ -3,7 +3,6 @@ package ru.practicum.server.handler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import ru.practicum.server.LocalDateTimeAdapter;
 import ru.practicum.server.DurationAdapter;
 
@@ -11,7 +10,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
-public abstract class BaseHttpHandler implements HttpHandler {
+public abstract class HttpHandler implements com.sun.net.httpserver.HttpHandler {
     protected static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(java.time.LocalDateTime.class, new LocalDateTimeAdapter())
             .registerTypeAdapter(java.time.Duration.class, new DurationAdapter())

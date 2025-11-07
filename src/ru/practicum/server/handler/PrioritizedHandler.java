@@ -7,7 +7,7 @@ import ru.practicum.model.Task;
 import java.io.IOException;
 import java.util.List;
 
-public class PrioritizedHandler extends BaseHttpHandler {
+public class PrioritizedHandler extends HttpHandler {
     private final TaskManager taskManager;
 
     public PrioritizedHandler(TaskManager taskManager) {

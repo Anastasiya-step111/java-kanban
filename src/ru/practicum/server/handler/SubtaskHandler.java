@@ -1,14 +1,16 @@
 package ru.practicum.server.handler;
 
 import com.sun.net.httpserver.HttpExchange;
-import ru.practicum.manager.*;
+import ru.practicum.manager.ManagerSaveException;
+import ru.practicum.manager.TaskManager;
 import ru.practicum.model.Subtask;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
-public class SubtaskHandler extends BaseHttpHandler {
+public class SubtaskHandler extends HttpHandler {
     private final TaskManager taskManager;
 
     public SubtaskHandler(TaskManager taskManager) {
