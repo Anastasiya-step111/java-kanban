@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 
 public abstract class BaseHttpHandler implements com.sun.net.httpserver.HttpHandler {
     protected static final Gson GSON = new GsonBuilder()
+            .excludeFieldsWithoutExposeAnnotation()
             .registerTypeAdapter(java.time.LocalDateTime.class, new LocalDateTimeAdapter())
             .registerTypeAdapter(java.time.Duration.class, new DurationAdapter())
             .create();

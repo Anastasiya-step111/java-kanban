@@ -85,12 +85,14 @@ public class PrioritizedHandlerIntegrationTest {
         Task[] tasks = GSON.fromJson(response.body(), Task[].class);
         assertEquals(3, tasks.length);
 
-        assertEquals("2027-01-01T08:00:00", tasks[0].getStartTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        assertEquals("2027-01-02T09:00:00", tasks[1].getStartTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        assertEquals("2027-01-03T10:00:00", tasks[2].getStartTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        assertEquals("2027-01-01T08:00:00",
+                tasks[0].getStartTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        assertEquals("2027-01-02T09:00:00",
+                tasks[1].getStartTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        assertEquals("2027-01-03T10:00:00",
+                tasks[2].getStartTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
     }
 
-    // === Тест 3: /prioritized включает подзадачи и обычные задачи, но не эпики ===
     @Test
     void shouldIncludeTasksAndSubtasksButNotEpics() throws Exception {
         createTask("Обычная задача", "Описание", "2027-01-01T10:00", 60);

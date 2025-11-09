@@ -143,7 +143,6 @@ public class SubtaskHandlerIntegrationTest {
 
     @Test
     void shouldGetSubtaskById() throws Exception {
-        // 1. Создаём эпик через HTTP
         String epicJson = """
         {"title": "Учить английский", "description": "Очень страшная задача"}
         """;
@@ -157,7 +156,6 @@ public class SubtaskHandlerIntegrationTest {
         );
         int epicId = GSON.fromJson(epicResp.body(), JsonObject.class).get("id").getAsInt();
 
-        // 2. Создаём подзадачу через HTTP
         LocalDateTime startTime = LocalDateTime.of(2027, 10, 1, 8, 0);
         String subtaskJson = String.format("""
         {
@@ -180,7 +178,6 @@ public class SubtaskHandlerIntegrationTest {
         );
         int subtaskId = GSON.fromJson(subtaskResp.body(), JsonObject.class).get("id").getAsInt();
 
-        // 3. Запрашиваем подзадачу
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:" + port + "/subtasks/" + subtaskId))
                 .GET()

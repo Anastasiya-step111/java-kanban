@@ -131,17 +131,21 @@ public class TaskHandlerIntegrationTest {
 
     @Test
     void shouldDeleteAllTasks() throws Exception {
-        String task1 = "{ \"title\": \"T1\", \"description\": \"\", \"startTime\": \"2025-11-08T16:00:00\", \"duration\": 10 }";
-        String task2 = "{ \"title\": \"T2\", \"description\": \"\", \"startTime\": \"2025-11-08T16:30:00\", \"duration\": 10 }";
+        String task1 = "{ \"title\": \"T1\", \"description\": \"\", \"startTime\": \"2025-11-08T16:00:00\", " +
+                "\"duration\": 10 }";
+        String task2 = "{ \"title\": \"T2\", \"description\": \"\", \"startTime\": \"2025-11-08T16:30:00\", " +
+                "\"duration\": 10 }";
 
         client.send(
                 HttpRequest.newBuilder().uri(URI.create("http://localhost:" + port + "/tasks"))
-                        .header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString(task1)).build(),
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(task1)).build(),
                 HttpResponse.BodyHandlers.ofString()
         );
         client.send(
                 HttpRequest.newBuilder().uri(URI.create("http://localhost:" + port + "/tasks"))
-                        .header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString(task2)).build(),
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(task2)).build(),
                 HttpResponse.BodyHandlers.ofString()
         );
 

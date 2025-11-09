@@ -58,7 +58,6 @@ public class EpicHandlerIntegrationTest {
         }
     }
 
-
     @Test
     void shouldAddEpicSuccessfully() throws IOException, InterruptedException {
         String json = """
@@ -77,7 +76,6 @@ public class EpicHandlerIntegrationTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(201, response.statusCode());
 
-        // 3. Проверяем через менеджер (допустимо, потому что taskManager — тот же, что в сервере)
         List<Epic> epics = taskManager.getAllEpics();
         assertEquals(1, epics.size());
         assertEquals("Учить английский", epics.get(0).getTitle());
@@ -145,7 +143,7 @@ public class EpicHandlerIntegrationTest {
         HttpResponse<String> response = client.send(
                 HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:" + port + "/epics"))
-                        .method("PUT", HttpRequest.BodyPublishers.noBody()) // не поддерживается
+                        .method("PUT", HttpRequest.BodyPublishers.noBody())
                         .build(),
                 HttpResponse.BodyHandlers.ofString()
         );

@@ -160,9 +160,12 @@ public class HistoryHandlerIntegrationTest {
         int id1 = createSimpleTask("Задача A", "A");
         int id2 = createSimpleTask("Задача B", "B");
 
-        client.send(HttpRequest.newBuilder().uri(URI.create("http://localhost:" + port + "/tasks/" + id1)).GET().build(), HttpResponse.BodyHandlers.ofString());
-        client.send(HttpRequest.newBuilder().uri(URI.create("http://localhost:" + port + "/tasks/" + id2)).GET().build(), HttpResponse.BodyHandlers.ofString());
-        client.send(HttpRequest.newBuilder().uri(URI.create("http://localhost:" + port + "/tasks/" + id1)).GET().build(), HttpResponse.BodyHandlers.ofString());
+        client.send(HttpRequest.newBuilder().uri(URI.create("http://localhost:" + port + "/tasks/" + id1))
+                .GET().build(), HttpResponse.BodyHandlers.ofString());
+        client.send(HttpRequest.newBuilder().uri(URI.create("http://localhost:" + port + "/tasks/" + id2))
+                .GET().build(), HttpResponse.BodyHandlers.ofString());
+        client.send(HttpRequest.newBuilder().uri(URI.create("http://localhost:" + port + "/tasks/" + id1))
+                .GET().build(), HttpResponse.BodyHandlers.ofString());
 
         Task[] history = getHistory();
         assertEquals(2, history.length);
@@ -175,8 +178,10 @@ public class HistoryHandlerIntegrationTest {
         int id1 = createSimpleTask("Удаляемая задача", "Будет удалена");
         int id2 = createSimpleTask("Сохраняемая задача", "Останется");
 
-        client.send(HttpRequest.newBuilder().uri(URI.create("http://localhost:" + port + "/tasks/" + id1)).GET().build(), HttpResponse.BodyHandlers.ofString());
-        client.send(HttpRequest.newBuilder().uri(URI.create("http://localhost:" + port + "/tasks/" + id2)).GET().build(), HttpResponse.BodyHandlers.ofString());
+        client.send(HttpRequest.newBuilder().uri(URI.create("http://localhost:" + port + "/tasks/" + id1))
+                .GET().build(), HttpResponse.BodyHandlers.ofString());
+        client.send(HttpRequest.newBuilder().uri(URI.create("http://localhost:" + port + "/tasks/" + id2))
+                .GET().build(), HttpResponse.BodyHandlers.ofString());
 
         client.send(
                 HttpRequest.newBuilder()
@@ -188,7 +193,8 @@ public class HistoryHandlerIntegrationTest {
 
         Task[] history = getHistory();
         assertEquals(2, history.length, "История должна содержать обе задачи");
-        assertEquals("Удаляемая задача", history[0].getTitle(), "Удаляемая задача должна оставаться в истории");
+        assertEquals("Удаляемая задача", history[0].getTitle(), "Удаляемая задача должна " +
+                "оставаться в истории");
     }
 
     @Test
