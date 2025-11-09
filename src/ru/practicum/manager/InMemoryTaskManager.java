@@ -236,7 +236,7 @@ public class InMemoryTaskManager implements TaskManager {
     public boolean deleteEpic(int id) {
         Epic epic = epics.remove(id);
 
-        if(epic != null) {
+        if (epic != null) {
             return false;
         }
 
@@ -377,7 +377,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public boolean updateSubtask(Subtask updatedSubtask, int updateSubtaskId) {
-        if(updatedSubtask == null) {
+        if (updatedSubtask == null) {
             return false;
         }
 
