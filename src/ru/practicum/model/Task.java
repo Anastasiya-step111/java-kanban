@@ -24,7 +24,9 @@ public class Task {
 
     protected transient TaskManager taskManager;
 
-    public Task() {}
+    public Task() {
+
+    }
 
     public Task(String title, String description, TaskManager taskManager, Status status,
                 LocalDateTime startTime, Duration duration) {

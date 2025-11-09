@@ -12,7 +12,9 @@ public class Subtask extends Task {
     @Expose
     private int epicId;
 
-    public Subtask() {}
+    public Subtask() {
+
+    }
 
     public Subtask(String title, String description, TaskManager taskManager, int epicId, Status status,
                    LocalDateTime startTime, Duration duration) {
