@@ -6,7 +6,13 @@ import ru.practicum.model.Subtask;
 import ru.practicum.model.Task;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TreeSet;
 
 public class InMemoryTaskManager implements TaskManager {
     protected static int taskCount = 1;
@@ -78,7 +84,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTaskById(int id) {
         Task task = tasks.get(id);
-        historyManager.add(task);
+        if (task != null) {
+            historyManager.add(task);
+        }
         return task;
     }
 
@@ -274,14 +282,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public List<Subtask> getSubtasksByEpicId(int id) {
-        List<Subtask> result = new ArrayList<>();
-        for (Subtask subtask : subtasks.values()) {
-            if (subtask.getId() == id) {
-                result.add(subtask);
-            }
-        }
-        return result;
+    public List<Subtask> getSubtasksByEpicId(int epicId) {
+        Epic epic = epics.get(epicId);
+        return epic.getSubtasks();
     }
 
     @Override

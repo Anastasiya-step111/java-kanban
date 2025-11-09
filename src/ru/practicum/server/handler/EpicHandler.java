@@ -72,6 +72,7 @@ public class EpicHandler extends BaseHttpHandler {
                     if ("/epics".equals(path)) {
                         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
                         Epic newEpic = GSON.fromJson(body, Epic.class);
+                        newEpic.setTaskManager(taskManager);
                         Epic epic = taskManager.createEpic(newEpic);
                         int id = epic.getId();
                         sendResponse(exchange, "{\"id\":" + id + "}", 201);
@@ -122,6 +123,7 @@ public class EpicHandler extends BaseHttpHandler {
                 default -> sendResponse(exchange, "{\"error\":\"Method not allowed\"}", 405);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             sendServerError(exchange);
         }
     }

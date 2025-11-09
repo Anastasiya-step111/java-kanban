@@ -52,6 +52,7 @@ public class TaskHandler extends BaseHttpHandler {
                     try {
                         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
                         Task newTask = GSON.fromJson(body, Task.class);
+                        newTask.setTaskManager(taskManager);
                         Task task = taskManager.createTask(newTask);
                         int id = task.getId();
 
@@ -87,6 +88,7 @@ public class TaskHandler extends BaseHttpHandler {
                 default -> sendResponse(exchange, "{\"error\":\"Method not allowed\"}", 405);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             sendServerError(exchange);
         }
     }

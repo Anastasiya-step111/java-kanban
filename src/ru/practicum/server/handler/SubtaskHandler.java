@@ -52,6 +52,7 @@ public class SubtaskHandler extends BaseHttpHandler {
                         try {
                             String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
                             Subtask newSubtask = GSON.fromJson(body, Subtask.class);
+                            newSubtask.setTaskManager(taskManager);
                             Subtask subtask = taskManager.createSubtask(newSubtask);
                             int id = subtask.getId();
 
@@ -117,6 +118,7 @@ public class SubtaskHandler extends BaseHttpHandler {
                 default -> sendResponse(exchange, "{\"error\":\"Method not allowed\"}", 405);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             sendServerError(exchange);
         }
     }
