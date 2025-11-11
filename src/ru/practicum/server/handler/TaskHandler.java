@@ -88,7 +88,6 @@ public class TaskHandler extends BaseHttpHandler {
                 default -> sendResponse(exchange, "{\"error\":\"Method not allowed\"}", 405);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             sendServerError(exchange);
         }
     }
