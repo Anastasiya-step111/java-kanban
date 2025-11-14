@@ -46,9 +46,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void deleteTask(int id) {
-        super.deleteTask(id);
+    public boolean deleteTask(int id) {
+        boolean result = super.deleteTask(id);
         save();
+        return result;
     }
 
     @Override
@@ -78,15 +79,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void removeSubtaskById(int id) {
-        super.removeSubtaskById(id);
+    public boolean removeSubtaskById(int id) {
+        boolean result = super.removeSubtaskById(id);
         save();
+        return result;
     }
 
     @Override
-    public void updateSubtask(Subtask updatedSubtask, int updateSubtaskId) {
-        super.updateSubtask(updatedSubtask, updateSubtaskId);
+    public boolean updateSubtask(Subtask updatedSubtask, int updateSubtaskId) {
+        boolean result = super.updateSubtask(updatedSubtask, updateSubtaskId);
         save();
+        return result;
     }
 
     @Override
@@ -104,15 +107,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void updateEpic(Epic epic) {
-        super.updateEpic(epic);
+    public boolean updateEpic(Epic epic) {
+        boolean result = super.updateEpic(epic);
         save();
+        return result;
     }
 
     @Override
-    public void deleteEpic(int id) {
-        super.deleteEpic(id);
+    public boolean deleteEpic(int id) {
+        boolean result = super.deleteEpic(id);
         save();
+        return result;
     }
 
     @Override
@@ -200,7 +205,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
                         try {
                             int id = Integer.parseInt(line.trim());
-                            //historyIds.add(String.valueOf(id));
+                            historyIds.add(id);
                         } catch (NumberFormatException e) {
                             System.err.println("Некорректный ID в истории: " + line);
                         }

@@ -20,7 +20,7 @@ public interface TaskManager {
 
         void updateTask(Task task);
 
-        void deleteTask(int id);
+        boolean deleteTask(int id);
 
         void deleteAllTasks();
 
@@ -30,9 +30,9 @@ public interface TaskManager {
 
         Epic createEpic(Epic epic);
 
-        void updateEpic(Epic epic);
+        boolean updateEpic(Epic epic);
 
-        void deleteEpic(int id);
+        boolean deleteEpic(int id);
 
         void deleteAllEpics();
 
@@ -46,9 +46,9 @@ public interface TaskManager {
 
         void deleteAllSubtasks();
 
-        void removeSubtaskById(int id);
+        boolean removeSubtaskById(int id);
 
-        void updateSubtask(Subtask subtask, int id);
+        boolean updateSubtask(Subtask subtask, int id);
 
         List<Task> getHistory();
 

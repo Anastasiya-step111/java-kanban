@@ -1,5 +1,6 @@
 package ru.practicum.model;
 
+import com.google.gson.annotations.Expose;
 import ru.practicum.CustomDateTimeFormatter;
 import ru.practicum.manager.TaskManager;
 
@@ -8,7 +9,12 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Subtask extends Task {
+    @Expose
     private int epicId;
+
+    public Subtask() {
+
+    }
 
     public Subtask(String title, String description, TaskManager taskManager, int epicId, Status status,
                    LocalDateTime startTime, Duration duration) {

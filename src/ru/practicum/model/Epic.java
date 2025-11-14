@@ -1,5 +1,6 @@
 package ru.practicum.model;
 
+import com.google.gson.annotations.Expose;
 import ru.practicum.CustomDateTimeFormatter;
 import ru.practicum.manager.TaskManager;
 
@@ -10,7 +11,12 @@ import java.util.List;
 import java.util.Objects;
 
 public class Epic extends Task {
+    @Expose
     private List<Subtask> subtasks;
+
+    public Epic() {
+        this.subtasks = new ArrayList<>();
+    }
 
     public Epic(String title, String description, TaskManager taskManager, Status status) {
         super(title, description, taskManager, status, null, null);

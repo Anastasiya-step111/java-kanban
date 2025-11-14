@@ -1,5 +1,6 @@
 package ru.practicum.model;
 
+import com.google.gson.annotations.Expose;
 import ru.practicum.CustomDateTimeFormatter;
 import ru.practicum.manager.TaskManager;
 
@@ -8,14 +9,24 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
+    @Expose
     private String title;
+    @Expose
     private String description;
+    @Expose
     private int id;
+    @Expose
     private Status status;
+    @Expose
     private LocalDateTime startTime;
+    @Expose
     private Duration duration;
 
-    protected TaskManager taskManager;
+    protected transient TaskManager taskManager;
+
+    public Task() {
+
+    }
 
     public Task(String title, String description, TaskManager taskManager, Status status,
                 LocalDateTime startTime, Duration duration) {
@@ -46,7 +57,6 @@ public class Task {
     public void setTitle(String title) {
 
         this.title = title;
-        taskManager.update(this);
     }
 
     public String getDescription() {
@@ -57,7 +67,6 @@ public class Task {
     public void setDescription(String description) {
 
         this.description = description;
-        taskManager.update(this);
     }
 
     public int getId() {
@@ -78,7 +87,10 @@ public class Task {
     public void setStatus(Status status) {
 
         this.status = status;
-        taskManager.update(this);
+    }
+
+    public void setTaskManager(TaskManager taskManager) {
+        this.taskManager = taskManager;
     }
 
     public LocalDateTime getStartTime() {
